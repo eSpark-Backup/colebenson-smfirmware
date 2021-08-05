@@ -9,8 +9,8 @@ void setup() {
 
 void loop() {
   digitalWrite(pin, HIGH);
-  delay(300);
+  delay(100);
   digitalWrite(pin, LOW);
-  delay(300);
+  delay(100);
 
 }
