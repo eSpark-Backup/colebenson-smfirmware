@@ -1,12 +1,12 @@
 // debug mode
 #include <SoftwareSerial.h>
-//SoftwareSerial mySerial(PA_1, PA_0); // RX, TX
+SoftwareSerial mySerial(PA_1, PA_0); // RX, TX
 #include <Serial_CAN_Module.h>
 
 Serial_CAN can;
 SoftwareSerial *canSerial2 = NULL;
 #define Serial mySerial
-SoftwareSerial mySerial(PB_6, PB_7); // RX, TX
+//SoftwareSerial mySerial(PA_1, PA_0); // RX, TX
 
 
 #define can_tx  PB_8           // tx of serial can module connect to PB8
@@ -35,7 +35,7 @@ void loop()
     delay(500);*/
 
    mySerial.println("Test");
-   mySerial.println(can.cmdOk("+++"));
+   //mySerial.println(can.cmdOk("+++"));
 
    delay(1000);
 
