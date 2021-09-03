@@ -515,14 +515,14 @@ void loop() {
   CAN_msg_t CAN_RX_msg;
 
   CAN_TX_msg.data[0] = 0x00;
-  CAN_TX_msg.data[1] = 0x01;
-  CAN_TX_msg.data[2] = 0x02;
-  CAN_TX_msg.data[3] = 0x03;
-  CAN_TX_msg.data[4] = 0x04;
-  CAN_TX_msg.data[5] = 0x05;
-  CAN_TX_msg.data[6] = 0x06;
-  CAN_TX_msg.data[7] = 0x07;
-  CAN_TX_msg.len = frameLength;
+  CAN_TX_msg.data[1] = 0xFF;
+  CAN_TX_msg.data[2] = 0x00;
+  CAN_TX_msg.data[3] = 0xFF;
+  CAN_TX_msg.data[4] = 0x00;
+  CAN_TX_msg.data[5] = 0x00;
+  CAN_TX_msg.data[6] = 0x00;
+  CAN_TX_msg.data[7] = 0x00;
+  CAN_TX_msg.len = 4;
 
   uint8_t send_ch = 1;
   unsigned long currentMillis = millis();
