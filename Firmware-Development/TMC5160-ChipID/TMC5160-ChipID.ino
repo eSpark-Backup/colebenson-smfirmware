@@ -1,27 +1,34 @@
+#include <stdio.h>
 #include <Arduino.h>
-#include <TMCStepper.h> // v0.7.1
+#include <TMCStepper.h>
+#include "HardwareSerial.h"
 
-constexpr uint8_t cs = 53;
+#define CS_PIN PA4
+#define MOSI_PIN PA7
+#define MISO_PIN PA6
+#define SCK_PIN PA5
+#define R_SENSE 0.075f
 
-TMC5160Stepper driver(cs, 0.075);
+HardwareSerial hserial2(PA3, PA2); // (RX, TX)
+TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, MOSI_PIN, MISO_PIN, SCK_PIN);
 
 void setup() {
-  Serial.begin(9600);
-  SPI.begin();
+  hserial2.begin(115200);
+  driver.begin();
   
-  pinMode(cs, OUTPUT);
-  digitalWrite(cs, HIGH);
+  pinMode(CS_PIN, OUTPUT);
+  digitalWrite(CS_PIN, HIGH);
 }
 
 void loop() {
   delay(3000);
-  Serial.print("Firmware version = ");
-  Serial.println(driver.version(), HEX);
-  Serial.print("Enabled = ");
-  Serial.println(driver.drv_enn());
-  Serial.print("Mode = ");
-  Serial.println(driver.sd_mode() ? "Step/Dir" : "Ramp Generator");
-}
+  hserial2.print("Firmware version = ");
+  hserial2.println(driver.version(), HEX);
+  hserial2.print("Enabled = ");
+  hserial2.println(driver.drv_enn());
+  hserial2.print("Mode = ");
+  hserial2.println(driver.sd_mode() ? "Step/Dir" : "Ramp Generator");
+} 
 
 void TMC2130Stepper::switchCSpin(bool state) {
   delayMicroseconds(100);
