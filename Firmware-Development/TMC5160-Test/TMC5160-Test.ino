@@ -1,14 +1,14 @@
 #include <TMCStepper.h>
 
-#define EN_PIN           10 // Enable
-#define DIR_PIN          9  // Direction
-#define STEP_PIN         8  // Step
-#define CS_PIN           52 // Chip select
-//#define SW_MOSI          66 // Software Master Out Slave In (MOSI)
-//#define SW_MISO          44 // Software Master In Slave Out (MISO)
-//#define SW_SCK           64 // Software Slave Clock (SCK)
-//#define SW_RX            63 // TMC2208/TMC2224 SoftwareSerial receive pin
-//#define SW_TX            40 // TMC2208/TMC2224 SoftwareSerial transmit pin
+#define EN_PIN           PC2 // Enable
+#define DIR_PIN          PC0  // Direction
+#define STEP_PIN         PC1  // Step
+#define CS_PIN           PA4 // Chip select
+#define SW_MOSI          PA7 // Software Master Out Slave In (MOSI)
+#define SW_MISO          PA6 // Software Master In Slave Out (MISO)
+#define SW_SCK           PA5 // Software Slave Clock (SCK)
+#define SW_RX            PA1 // TMC2208/TMC2224 SoftwareSerial receive pin
+#define SW_TX            PA0 // TMC2208/TMC2224 SoftwareSerial transmit pin
 //#define SERIAL_PORT Serial1 // TMC2208/TMC2224 HardwareSerial port
 #define DRIVER_ADDRESS 0b00 // TMC2209 Driver address according to MS1 and MS2
 
@@ -23,8 +23,8 @@
 //TMC2130Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK); // Software SPI
 //TMC2660Stepper driver(CS_PIN, R_SENSE);                           // Hardware SPI
 //TMC2660Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
-TMC5160Stepper driver(CS_PIN, R_SENSE);
-//TMC5160Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
+//TMC5160Stepper driver(CS_PIN, R_SENSE);
+TMC5160Stepper driver(CS_PIN, R_SENSE, SW_MOSI, SW_MISO, SW_SCK);
 
 //TMC2208Stepper driver(&SERIAL_PORT, R_SENSE);                     // Hardware Serial
 //TMC2208Stepper driver(SW_RX, SW_TX, R_SENSE);                     // Software serial
@@ -38,7 +38,7 @@ void setup() {
   digitalWrite(EN_PIN, LOW);      // Enable driver in hardware
 
                                   // Enable one according to your setup
-  SPI.begin();                    // SPI drivers
+//  SPI.begin();                    // SPI drivers
 //SERIAL_PORT.begin(115200);      // HW UART drivers
 //driver.beginSerial(115200);     // SW UART drivers
 
