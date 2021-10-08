@@ -520,7 +520,7 @@ void loop() {
   CAN_TX_msg.data[3] = 0x03;
   CAN_TX_msg.data[4] = 0x04;
   CAN_TX_msg.data[5] = 0x05;
-  CAN_TX_msg.data[6] = 0x06;
+  CAN_TX_msg.data[6] = 0x06; 
   CAN_TX_msg.data[7] = 0x07;
   CAN_TX_msg.len = frameLength;
 

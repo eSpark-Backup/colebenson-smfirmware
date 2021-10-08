@@ -16,8 +16,10 @@ HardwareSerial hserial2(PA1, PA0); // (RX, TX)
 TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, MOSI_PIN, MISO_PIN, SCK_PIN);
 
 bool dir = true;
+bool shaft = true;
 
-void setup() {
+
+void setup() { //********************************************************************************************
   hserial2.begin(115200);
 
   pinMode(CS_PIN, OUTPUT);
@@ -45,11 +47,12 @@ void setup() {
   driver.VSTART(0);
   driver.a1(5);
   driver.v1(40);
-  driver.AMAX(150);
-  driver.VMAX(10000);
+  driver.AMAX(1000);
+  driver.VMAX(100000);
   driver.DMAX(300);
   driver.d1(40);
   driver.VSTOP(0);
+  driver.shaft(true);
 
   //current motor position
   driver.XACTUAL(0);
@@ -58,7 +61,7 @@ void setup() {
   
 }
 
-void loop() {
+void loop() {  //***************************************************************************************************
 //  delay(300);
   hserial2.print("Firmware version = ");
   hserial2.println(driver.version(), HEX);

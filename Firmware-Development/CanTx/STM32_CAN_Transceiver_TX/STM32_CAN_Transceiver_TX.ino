@@ -7,6 +7,13 @@ SoftwareSerial mySerial(PA_1, PA_0); // RX, TX
 
 #define DEBUG 1
 
+bool direction = 0;
+int speed;
+uint8_t FB;
+uint8_t MB;
+uint8_t LB;
+
+
 /* Symbolic names for bit rate of CAN message                                */
 typedef enum {CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_1000KBPS} BITRATE;
 
@@ -497,7 +504,7 @@ uint8_t frameLength = 0;
 unsigned long previousMillis = 0;     // stores last time output was updated
 const long interval = 1000;           // transmission interval (milliseconds)
 
-void setup() {
+void setup() { //*********************************************************************************************************************************
   Serial.begin(115200);
   //bool ret = CANInit(CAN_1000KBPS, 0);  // CAN_RX mapped to PA11, CAN_TX mapped to PA12
   bool ret = CANInit(CAN_50KBPS, 2);  // CAN_RX mapped to PB8, CAN_TX mapped to PB9
@@ -510,43 +517,45 @@ void setup() {
     }*/
 }
 
-void loop() {
+void loop() { //***********************************************************************************************************************************
+ 
+
+  uint32_t FB_32, MB_32;
+  direction = !direction;
+
+  for(unsigned int i = 500; i<=110000; i+=100000)
+  {
+    speed = i;
+
+  FB = speed & 0x0000FF;
+  MB_32 = (speed & 0x00FF00) >> 8;
+  MB = (uint8_t) MB_32;
+  LB = (speed & 0xFF0000) >> 16;
+
+
+
   CAN_msg_t CAN_TX_msg;
   CAN_msg_t CAN_RX_msg;
 
-  CAN_TX_msg.data[0] = 0x00;
-  CAN_TX_msg.data[1] = 0xFF;
-  CAN_TX_msg.data[2] = 0x00;
-  CAN_TX_msg.data[3] = 0xFF;
-  CAN_TX_msg.data[4] = 0x00;
-  CAN_TX_msg.data[5] = 0x00;
-  CAN_TX_msg.data[6] = 0x00;
-  CAN_TX_msg.data[7] = 0x00;
+  CAN_TX_msg.data[0] = direction;
+  CAN_TX_msg.data[1] = FB;
+  CAN_TX_msg.data[2] = MB;
+  CAN_TX_msg.data[3] = LB;
   CAN_TX_msg.len = 4;
 
   uint8_t send_ch = 1;
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    if ( ( counter % 2) == 0) {
-      CAN_TX_msg.type = DATA_FRAME;
-      if (CAN_TX_msg.len == 0) CAN_TX_msg.type = REMOTE_FRAME;
-      CAN_TX_msg.format = EXTENDED_FORMAT;
-      CAN_TX_msg.id = 0x32F407;
-    } else {
-      CAN_TX_msg.type = DATA_FRAME;
-      if (CAN_TX_msg.len == 0) CAN_TX_msg.type = REMOTE_FRAME;
-      CAN_TX_msg.format = STANDARD_FORMAT;
-      CAN_TX_msg.id = 0x407;
-      //}
-      CANSend(send_ch, &CAN_TX_msg);
-      frameLength++;
-      if (frameLength == 9) frameLength = 0;
-    }
-    counter++;
+  CAN_TX_msg.type = DATA_FRAME;
+  if (CAN_TX_msg.len == 0) CAN_TX_msg.type = REMOTE_FRAME;
+  CAN_TX_msg.format = STANDARD_FORMAT;
+  CAN_TX_msg.id = 0x407;
+  //}
+  CANSend(send_ch, &CAN_TX_msg);
+  
+  delay(5000);
   }
 
-  uint8_t recv_ch = 1;
+
+  //uint8_t recv_ch = 1;
   /*if (CANMsgAvail(recv_ch)) {
     CANReceive(recv_ch, &CAN_RX_msg);
     Serial.print("Channel:");
