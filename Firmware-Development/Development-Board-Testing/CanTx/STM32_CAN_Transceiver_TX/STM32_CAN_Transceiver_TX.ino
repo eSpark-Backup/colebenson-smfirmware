@@ -1,17 +1,20 @@
 #include "SoftwareSerial.h"
+#include "HardwareSerial.h"
 
-SoftwareSerial mySerial(PA_1, PA_0); // RX, TX
+//SoftwareSerial mySerial(PA1, PA0); // RX, TX
+HardwareSerial hserial2(PA1, PA0); // (RX, TX)
 
-#define Serial mySerial
-
+//#define Serial mySerial
+#define Serial hserial2
 
 #define DEBUG 1
 
 bool direction = 0;
-int speed;
+int speed = 10000;
 uint8_t FB;
 uint8_t MB;
 uint8_t LB;
+int incomingByte = 0;
 
 
 /* Symbolic names for bit rate of CAN message                                */
@@ -516,16 +519,34 @@ void setup() { //***************************************************************
     }
     }*/
 }
-
+String s;
 void loop() { //***********************************************************************************************************************************
+
  
+  String s_speed = "";
+  String s_direction = "";
+ 
+ 
+  if (Serial.available() > 0) {
+    s = Serial.readStringUntil('\n');
 
+    // say what you got:
+    Serial.print("String Received : ");
+    Serial.println(s);
+    byte x = s.indexOf(',');
+    s_speed = s.substring(0, x);
+    s_direction = s.substring(x+1, sizeof(s) - 1);
+    speed = s_speed.toFloat();
+    direction = s_direction.toFloat();
+    Serial.print("Speed : ");
+    Serial.println(speed);
+    Serial.print("Direction : ");
+    Serial.println(direction);
+    
+  }
+
+  
   uint32_t FB_32, MB_32;
-  direction = !direction;
-
-  for(unsigned int i = 500; i<=110000; i+=100000)
-  {
-    speed = i;
 
   FB = speed & 0x0000FF;
   MB_32 = (speed & 0x00FF00) >> 8;
@@ -550,9 +571,6 @@ void loop() { //****************************************************************
   CAN_TX_msg.id = 0x407;
   //}
   CANSend(send_ch, &CAN_TX_msg);
-  
-  delay(5000);
-  }
 
 
   //uint8_t recv_ch = 1;
