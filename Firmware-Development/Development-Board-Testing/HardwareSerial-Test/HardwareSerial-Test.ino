@@ -3,6 +3,7 @@
 #include "HardwareSerial.h"
 
 //HardwareSerial hserial4(1, 0);
+char a[2];
 HardwareSerial hserial2(PA3, PA2); // (RX, TX)
 
 void setup() {
@@ -26,8 +27,10 @@ void loop() {
 //  }
 
 /* Single Serial Test Code */
-  hserial2.println("Testing");
-  delay(500);
-  
-
+  if (hserial2.available() > 0) {
+    hserial2.readBytes(a, 2);
+    
+    if(a[0] == '$' && a[1] == '#')
+      hserial2.println("$#");
+  }
 }
