@@ -4,6 +4,9 @@
 ## STM32DuinoCore-Github
  https://github.com/stm32duino/Arduino_Core_STM32
  
+### STM32 Variants File for Pin Definition
+ https://github.com/stm32duino/Arduino_Core_STM32/blob/main/variants/STM32F4xx/F407V(E-G)T_F417V(E-G)T/variant_generic.cpp
+ 
 ## Project Dependencies
 
 ### STM32F4 Software Development Kit
