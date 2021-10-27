@@ -15,8 +15,12 @@
 2. https://www.st.com/en/development-tools/stsw-link007.html (Firmware Update for Debugger)
 
 ### Arduino IDE Development Environment for Custom Board
+
 ![image](https://user-images.githubusercontent.com/76909080/139075820-1104380a-4e52-4e43-a465-e5b54c6c8d06.png)
 
 ### STM32 Boot Mode Selection
+1. Two Boot Modes of STM32 will be focused upon: System Memory and User Flash Memory modes.
+2. To select between these two modes, keep BOOT1 connected to (GND <0>), and switch between (VCC <1>) / (GND <0>) for BOOT0.
+3. 
 ![image](https://user-images.githubusercontent.com/76909080/139076461-e29edceb-ec9c-40e3-9cbc-7d05221edb2c.png)
 
