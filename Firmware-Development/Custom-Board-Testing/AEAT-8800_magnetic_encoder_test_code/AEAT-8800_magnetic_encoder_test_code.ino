@@ -322,6 +322,9 @@ void loop() {
 
 
 
+  /*  uint8_t readReg[ 3 ] = { 0 };
+    uint16_t angleData;
+    uint8_t status;
 
   /*  uint8_t readReg[ 3 ] = { 0 };
     uint16_t angleData;
