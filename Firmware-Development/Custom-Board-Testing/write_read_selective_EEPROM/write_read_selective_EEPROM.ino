@@ -55,7 +55,7 @@ void loop() {
   Wire.write((mem_addr) >> 8);
   Wire.write((mem_addr) & (0xFF));
 
-  Wire.write(99);
+  Wire.write(129);
 
   Serial.println("Response 2");
   Serial.println(Wire.endTransmission(true));
