@@ -9,7 +9,10 @@
 #define SCK_PIN PA5
 #define R_SENSE 0.075f
 
-HardwareSerial hserial2(PA1, PA0); // (RX, TX)
+//HardwareSerial hserial2(PA1, PA0); // (RX, TX)
+
+#define Serial hserial2;
+
 TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, MOSI_PIN, MISO_PIN, SCK_PIN);
 
 void setup() {
