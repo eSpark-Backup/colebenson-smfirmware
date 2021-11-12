@@ -12,7 +12,7 @@
 //#define SERIAL_PORT Serial1 // TMC2208/TMC2224 HardwareSerial port
 #define DRIVER_ADDRESS 0b00 // TMC2209 Driver address according to MS1 and MS2
 
-#define R_SENSE 0.075f // Match to your driver
+#define R_SENSE 0.0165f // Match to your driver
                       // SilentStepStick series use 0.11
                       // UltiMachine Einsy and Archim2 boards use 0.2
                       // Panucatt BSD2660 uses 0.1
@@ -57,12 +57,14 @@ bool shaft = false;
 
 void loop() {
   // Run 5000 steps and switch direction in software
-  for (uint16_t i = 5000; i>0; i--) {
+  /*for (uint16_t i = 5000; i>0; i--) {
     digitalWrite(STEP_PIN, HIGH);
     delayMicroseconds(160);
     digitalWrite(STEP_PIN, LOW);
     delayMicroseconds(160);
-  }
-  shaft = !shaft;
-  driver.shaft(shaft);
+  }/*
+
+  /*shaft ^= 1;*/
+
+  //digitalWrite(DIR_PIN, HIGH);
 }

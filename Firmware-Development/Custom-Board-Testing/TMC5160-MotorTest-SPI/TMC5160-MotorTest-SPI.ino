@@ -35,11 +35,11 @@ void setup() { //***************************************************************
   //digitalWrite(CS_PIN, HIGH);
 
 
-  driver.rms_current(600);
+  driver.rms_current(1000);
   driver.en_pwm_mode(1);      // Enable extremely quiet stepping
   driver.pwm_autoscale(1);
   driver.microsteps(128);
-  driver.toff(1);
+  driver.toff(5);
   driver.irun(17);
   driver.ihold(10);
   driver.iholddelay(6);
@@ -73,7 +73,6 @@ void loop() {  //***************************************************************
   hserial2.println(driver.drv_enn());
   hserial2.print("Mode = ");
   hserial2.println(driver.sd_mode() ? "Step/Dir" : "Ramp Generator");
-  delay(1000);
   driver.XTARGET(driver.XACTUAL() + 300000);
 
   /*for (uint16_t i = 5000; i > 0; i--) {
@@ -81,8 +80,11 @@ void loop() {  //***************************************************************
     delayMicroseconds(160);
     digitalWrite(STEP_PIN, LOW);
     delayMicroseconds(160);
-  }
-  shaft = !shaft;
+  }*/
+
+  delay(1000);
+  
+  /*shaft = !shaft;
   driver.shaft(shaft);*/
 }
 

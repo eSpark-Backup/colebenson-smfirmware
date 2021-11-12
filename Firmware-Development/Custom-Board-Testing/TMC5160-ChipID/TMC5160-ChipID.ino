@@ -7,7 +7,7 @@
 #define MOSI_PIN PA7
 #define MISO_PIN PA6
 #define SCK_PIN PA5
-#define R_SENSE 0.075f
+#define R_SENSE 0.0165f
 
 //HardwareSerial hserial2(PA1, PA0); // (RX, TX)
 
