@@ -505,8 +505,8 @@ void setup() {
   pinMode(PC1, OUTPUT);
   pinMode(PC2, OUTPUT);
 
-  digitalWrite(PC1, LOW);
-  digitalWrite(PC2, LOW);
+  digitalWrite(PC1, HIGH);
+  digitalWrite(PC2, HIGH);
 
   
   

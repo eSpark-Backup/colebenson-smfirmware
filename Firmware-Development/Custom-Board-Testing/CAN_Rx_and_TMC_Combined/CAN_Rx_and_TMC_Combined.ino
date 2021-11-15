@@ -6,17 +6,19 @@
 
 //SoftwareSerial mySerial(PA1, PA0); // RX, TX
 
-#define EN_PIN           PC2 // Enable
-#define DIR_PIN          PC0  // Direction
-#define STEP_PIN         PC1  // Step
+#define EN_PIN           PC11 // Enable
+/*#define DIR_PIN          PC0  // Direction
+  #define STEP_PIN         PC1  // Step*/
 #define CS_PIN           PA4
 #define MOSI_PIN         PA7
 #define MISO_PIN         PA6
 #define SCK_PIN          PA5
-#define R_SENSE          0.075f
+#define R_SENSE          0.0165f
 
 /*HardwareSerial hserial2(PA1, PA0); // (RX, TX)
-#define Serial hserial2*/
+  #define Serial hserial2*/
+
+#define hserial2 Serial
 
 TMC5160Stepper driver = TMC5160Stepper(CS_PIN, R_SENSE, MOSI_PIN, MISO_PIN, SCK_PIN);
 
@@ -518,11 +520,11 @@ unsigned long previousMillis = 0;     // stores last time output was updated
 const long interval = 1000;           // transmission interval (milliseconds)
 
 void setup() {
-  
+
   Serial.begin(115200);
   //bool ret = CANInit(CAN_1000KBPS, 0);  // CAN_RX mapped to PA11, CAN_TX mapped to PA12
   //bool ret = CANInit(CAN_50KBPS, 2);  // CAN_RX mapped to PB8, CAN_TX mapped to PB9
-  bool ret = CANInit(CAN_50KBPS, 3);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
+  bool ret = CANInit(CAN_1000KBPS, 3);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
   if (!ret) {
     while (true) {
       Serial.println("Failed init");
@@ -532,18 +534,24 @@ void setup() {
 
   //hserial2.begin(115200);
 
+  pinMode(PC1, OUTPUT);
+  pinMode(PC2, OUTPUT);
+
+  digitalWrite(PC1, HIGH);
+  digitalWrite(PC2, HIGH);
+
   pinMode(CS_PIN, OUTPUT);
   digitalWrite(CS_PIN, HIGH);
   pinMode(EN_PIN, OUTPUT);
   digitalWrite(EN_PIN, LOW);
-  
+
   driver.begin();
-  
+
   //pinMode(CS_PIN, OUTPUT);
   //digitalWrite(CS_PIN, HIGH);
 
 
-  driver.rms_current(600); 
+  driver.rms_current(600);
   driver.en_pwm_mode(1);      // Enable extremely quiet stepping
   driver.pwm_autoscale(1);
   driver.microsteps(128);
@@ -605,7 +613,7 @@ void loop() {
     frameLength++;
     if (frameLength == 9) frameLength = 0;
     counter++;
-  }*/
+    }*/
 
   uint8_t recv_ch = 1;
   if (CANMsgAvail(recv_ch)) {
@@ -642,23 +650,23 @@ void loop() {
       Serial.println(" Data: REMOTE REQUEST FRAME");
     }
   }
-  
-  /*if(CAN_RX_msg.data[0] == 0x00)
+
+  if (CAN_RX_msg.data[0] == 0x00)
   {
     driver.shaft(false);
-    
-    }
-    
-  else if(CAN_RX_msg.data[0] == 0x01)
+
+  }
+
+  else if (CAN_RX_msg.data[0] == 0x01)
   {
     driver.shaft(true);
-    }
-  else{}*/
+  }
+  else {}
 
- /* uint8_t v = CAN_RX_msg.data[1];
-  driver.VMAX(v);*/
-  
- /* hserial2.print("Bit 0 : ");
+  uint8_t v = CAN_RX_msg.data[1];
+  driver.VMAX(v);
+
+  hserial2.print("Bit 0 : ");
   hserial2.println(CAN_RX_msg.data[0]);
   hserial2.print("Bit 1 : ");
   hserial2.println(CAN_RX_msg.data[1]);
@@ -666,7 +674,7 @@ void loop() {
   hserial2.println(CAN_RX_msg.data[2] << 8);
   hserial2.print("Bit 3 : ");
   hserial2.println(CAN_RX_msg.data[3] << 16);
-  
+
   speed = ((CAN_RX_msg.data[1]) | (CAN_RX_msg.data[2] << 8) | (CAN_RX_msg.data[3] << 16));
   driver.VMAX(speed);
   hserial2.print("Speed = ");
@@ -680,8 +688,8 @@ void loop() {
   hserial2.println(driver.drv_enn());
   hserial2.print("Mode = ");
   hserial2.println(driver.sd_mode() ? "Step/Dir" : "Ramp Generator");
- delay(1000);
- driver.XTARGET(driver.XACTUAL() + 300000);*/
+  delay(1000);
+  driver.XTARGET(driver.XACTUAL() + 300000);
 
 }
 
