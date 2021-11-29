@@ -710,16 +710,6 @@ void loop() {
   CAN_msg_t CAN_TX_msg;
   CAN_msg_t CAN_RX_msg;
 
-  CAN_TX_msg.data[0] = 0x00;
-  CAN_TX_msg.data[1] = 0x01;
-  CAN_TX_msg.data[2] = 0x02;
-  CAN_TX_msg.data[3] = 0x03;
-  CAN_TX_msg.data[4] = 0x04;
-  CAN_TX_msg.data[5] = 0x05;
-  CAN_TX_msg.data[6] = 0x06;
-  CAN_TX_msg.data[7] = 0x07;
-  CAN_TX_msg.len = frameLength;
-
   uint8_t send_ch = 1;
   unsigned long currentMillis = millis();
   float tempC;
@@ -842,6 +832,7 @@ void loop() {
 
     writeEEAddr(9, round(Angle));
     Serial.print("Angle "); Serial.print(Angle); Serial.println(" stored to address 9");
+
   }
 
   else if (CAN_RX_msg.data[0] == 0x01)
@@ -851,32 +842,26 @@ void loop() {
     pixels.show();
     Serial.println("Get data");
 
-    writeEEAddr(1, round(tempC));
-    Serial.print("Temperature "); Serial.print(tempC); Serial.println(" stored to address 1");
+    CAN_TX_msg.data[0] = readEEAddr(1);
+    CAN_TX_msg.data[1] = readEEAddr(2);
+    CAN_TX_msg.data[2] = readEEAddr(3);
+    CAN_TX_msg.data[3] = readEEAddr(4);
+    CAN_TX_msg.data[4] = readEEAddr(5);
+    CAN_TX_msg.data[5] = readEEAddr(6);
+    CAN_TX_msg.data[6] = readEEAddr(7);
+    CAN_TX_msg.data[7] = readEEAddr(8);
+    CAN_TX_msg.data[8] = readEEAddr(9);
 
-    writeEEAddr(2, round(accel.acceleration.x));
-    Serial.print("AccX "); Serial.print(accel.acceleration.x); Serial.println(" stored to address 2");
+    CAN_TX_msg.len = 9;
 
-    writeEEAddr(3, round(accel.acceleration.y));
-    Serial.print("AccY "); Serial.print(accel.acceleration.y); Serial.println(" stored to address 3");
+    uint8_t send_ch = 1;
+    CAN_TX_msg.type = DATA_FRAME;
+    if (CAN_TX_msg.len == 0) CAN_TX_msg.type = REMOTE_FRAME;
+    CAN_TX_msg.format = STANDARD_FORMAT;
+    CAN_TX_msg.id = 0x40A;
+    //}
+    CANSend(send_ch, &CAN_TX_msg);
 
-    writeEEAddr(4, round(accel.acceleration.z));
-    Serial.print("AccZ "); Serial.print(accel.acceleration.z); Serial.println(" stored to address 4");
-
-    writeEEAddr(5, round(gyro.gyro.x));
-    Serial.print("GyroX "); Serial.print(gyro.gyro.x); Serial.println(" stored to address 5");
-
-    writeEEAddr(6, round(gyro.gyro.y));
-    Serial.print("GyroY "); Serial.print(gyro.gyro.y); Serial.println(" stored to address 6");
-
-    writeEEAddr(7, round(gyro.gyro.z));
-    Serial.print("GyroZ "); Serial.print(gyro.gyro.z); Serial.println(" stored to address 7");
-
-    writeEEAddr(8, round(gyro.gyro.z));
-    Serial.print("GyroZ "); Serial.print(gyro.gyro.z); Serial.println(" stored to address 8");
-
-    writeEEAddr(9, round(Angle));
-    Serial.print("Angle "); Serial.print(Angle); Serial.println(" stored to address 9");
   }
   else {
     Serial.println("Not a valid data");
