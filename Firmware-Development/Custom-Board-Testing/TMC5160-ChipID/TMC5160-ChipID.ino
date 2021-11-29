@@ -21,6 +21,9 @@ void setup() {
   
   pinMode(CS_PIN, OUTPUT);
   digitalWrite(CS_PIN, HIGH);
+
+  pinMode(PC11, OUTPUT);
+  digitalWrite(PC11, LOW);
 }
 
 void loop() {

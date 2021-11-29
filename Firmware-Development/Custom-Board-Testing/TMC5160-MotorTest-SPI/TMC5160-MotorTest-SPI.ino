@@ -25,7 +25,7 @@ void setup() { //***************************************************************
   hserial2.begin(115200);
 
   pinMode(CS_PIN, OUTPUT);
-  digitalWrite(CS_PIN, HIGH);
+  digitalWrite(CS_PIN, LOW);
   pinMode(EN_PIN, OUTPUT);
   digitalWrite(EN_PIN, LOW);
 

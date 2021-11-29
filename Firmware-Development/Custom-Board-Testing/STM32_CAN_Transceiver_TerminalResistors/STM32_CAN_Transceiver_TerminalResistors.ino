@@ -510,7 +510,7 @@ void setup() {
 
   
   
-  bool ret = CANInit(CAN_50KBPS, 3);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
+  bool ret = CANInit(CAN_1000KBPS, 3);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
   if (!ret) {
     while (true) {
       Serial.println("Failed init");
