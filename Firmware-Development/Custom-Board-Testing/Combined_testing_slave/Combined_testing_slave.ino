@@ -713,6 +713,9 @@ void loop() {
   uint8_t send_ch = 1;
   unsigned long currentMillis = millis();
   float tempC;
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
 
   uint8_t recv_ch = 1;
   if (CANMsgAvail(recv_ch)) {
@@ -757,54 +760,13 @@ void loop() {
 
     Serial.println("Record data");
 
-    //Serial.print("Temperature C: ");
-    tempC = getTempC_MCP9805();
-    //Serial.println(tempC);
-
-    sensors_event_t accel;
-    sensors_event_t gyro;
-    sensors_event_t temp;
-    icm.getEvent(&accel, &gyro, &temp);
-
-    /* Display the results (acceleration is measured in m/s^2) */
-    /*Serial.print("\t\tAccel X: ");
-      Serial.print(accel.acceleration.x);
-      Serial.print(" \tY: ");
-      Serial.print(accel.acceleration.y);
-      Serial.print(" \tZ: ");
-      Serial.print(accel.acceleration.z);
-      Serial.println(" m/s^2 ");*/
-
-    /*Display the results (acceleration is measured in m/s^2) */
-    /*Serial.print("\t\tGyro X: ");
-      Serial.print(gyro.gyro.x);
-      Serial.print(" \tY: ");
-      Serial.print(gyro.gyro.y);
-      Serial.print(" \tZ: ");
-      Serial.print(gyro.gyro.z);
-      Serial.println(" radians/s ");
-      Serial.println();*/
-
-
-    uint8_t status;
-    status = angle4_getNewAngle(&Angle);
-    /*Serial.print("_ANGLE4_REG_CUSTOMER_CFG_1: ");
-      Serial.println(angle4_readByte(_ANGLE4_REG_CUSTOMER_CFG_1));*/
-
-    /*Serial.print("status = ");
-      Serial.println(status);
-      Serial.print("angle = ");
-      Serial.println(Angle);*/
-
-    /*Serial.print("Address "); Serial.print(mem_addr); Serial.print(" before writing: ");
-      Serial.println(readEEAddr(mem_addr));
-
-      writeEEAddr(mem_addr, round(tempC));
-
-      Serial.print("Address "); Serial.print(mem_addr); Serial.print(" after writing: ");
-      Serial.println(readEEAddr(mem_addr));
-
-      mem_addr++;*/
+    for (int i = 0; i < 100; i++)
+    {
+      tempC = getTempC_MCP9805();
+      icm.getEvent(&accel, &gyro, &temp);
+      uint8_t status;
+      status = angle4_getNewAngle(&Angle);
+    }
 
     writeEEAddr(1, round(tempC));
     Serial.print("Temperature "); Serial.print(tempC); Serial.println(" stored to address 1");
@@ -827,10 +789,7 @@ void loop() {
     writeEEAddr(7, round(gyro.gyro.z));
     Serial.print("GyroZ "); Serial.print(gyro.gyro.z); Serial.println(" stored to address 7");
 
-    writeEEAddr(8, round(gyro.gyro.z));
-    Serial.print("GyroZ "); Serial.print(gyro.gyro.z); Serial.println(" stored to address 8");
-
-    writeEEAddr(9, round(Angle));
+    writeEEAddr(8, round(Angle));
     Serial.print("Angle "); Serial.print(Angle); Serial.println(" stored to address 9");
 
   }
@@ -840,7 +799,7 @@ void loop() {
     driver.shaft(true);
     pixels.setPixelColor(0, pixels.Color(0, 0, 150));
     pixels.show();
-    Serial.println("Get data");
+
 
     CAN_TX_msg.data[0] = readEEAddr(1);
     CAN_TX_msg.data[1] = readEEAddr(2);
@@ -850,9 +809,8 @@ void loop() {
     CAN_TX_msg.data[5] = readEEAddr(6);
     CAN_TX_msg.data[6] = readEEAddr(7);
     CAN_TX_msg.data[7] = readEEAddr(8);
-    CAN_TX_msg.data[8] = readEEAddr(9);
 
-    CAN_TX_msg.len = 9;
+    CAN_TX_msg.len = 8;
 
     uint8_t send_ch = 1;
     CAN_TX_msg.type = DATA_FRAME;
@@ -881,10 +839,7 @@ void writeEEAddr(uint16_t addr, uint8_t val)
 
   Wire_EE.write(val);
 
-  Serial.println("Value: ");
-  Serial.println(val);
-
-  Serial.println(Wire_EE.endTransmission(true));
+  Wire_EE.endTransmission(true);
 
   delay(10);
 }
@@ -896,7 +851,7 @@ byte readEEAddr(uint16_t addr)
   Wire_EE.write((addr) >> 8);
   Wire_EE.write((addr) & (0xFF));
 
-  Serial.println(Wire_EE.endTransmission(false));
+  Wire_EE.endTransmission(false);
 
   delay(10);
 
@@ -1074,7 +1029,7 @@ uint8_t angle4_getNewAngle(uint16_t *dataOut)
   }
   else
   {
-    Serial.println("16-bit");
+    //Serial.println("16-bit");
     newAngle = angleData * 0.005493247;
     /* Status 0x0F - Ready, MHI, MLO, Parity */
     status = (readReg[2] >> 4) & 0x0F;

@@ -15,6 +15,8 @@ uint8_t FB;
 uint8_t MB;
 uint8_t LB;
 int incomingByte = 0;
+bool rcv_data = false;
+String variables[] = {"TempC", "AccX", "AccY", "AccZ", "GyroX", "GyroY", "GyroZ", "Angle"};
 
 
 /* Symbolic names for bit rate of CAN message                                */
@@ -507,6 +509,7 @@ uint8_t frameLength = 0;
 unsigned long previousMillis = 0;     // stores last time output was updated
 const long interval = 1000;           // transmission interval (milliseconds)
 CAN_msg_t CAN_TX_msg;
+CAN_msg_t CAN_RX_msg;
 
 void setup() { //*********************************************************************************************************************************
   Serial.begin(115200);
@@ -533,6 +536,7 @@ void loop() { //****************************************************************
 
     if (s == "0")
     {
+      rcv_data = false;
       CAN_TX_msg.data[0] = 0;
 
       CAN_TX_msg.len = 1;
@@ -546,6 +550,7 @@ void loop() { //****************************************************************
       CANSend(send_ch, &CAN_TX_msg);
     } else if (s == "1")
     {
+      rcv_data = true;
       CAN_TX_msg.data[0] = 1;
 
       CAN_TX_msg.len = 1;
@@ -558,6 +563,28 @@ void loop() { //****************************************************************
       //}
       CANSend(send_ch, &CAN_TX_msg);
     }
+  }
+
+  uint8_t recv_ch = 1;
+  if (rcv_data)
+  {
+    if (CANMsgAvail(recv_ch))
+    {
+      CANReceive(recv_ch, &CAN_RX_msg);
+
+      Serial.print(CAN_RX_msg.len);
+      if (CAN_RX_msg.type == DATA_FRAME) {
+      Serial.print(" Data: ");
+        for (int i = 0; i < CAN_RX_msg.len; i++) {
+          Serial.print(variables[i]);Serial.print(": ");
+          Serial.println(CAN_RX_msg.data[i]);
+        }
+      } else {
+        Serial.println(" Data: REMOTE REQUEST FRAME");
+      }
+    }
+
+    delay(2000);
   }
 
 
