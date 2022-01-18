@@ -2,8 +2,7 @@
 
 void setup() {
   // put your setup code here, to run once:
-  initTMCSPI(SPI_mode);
-  Serial.println(FAILED + 5);
+  initTMC(SPI_MODE);
 }
 
 void loop() {
