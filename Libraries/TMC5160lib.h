@@ -53,4 +53,24 @@ extern "C"
 	static void vsense(uint8_t B);
 	static void irun(uint8_t B);
 	static void ihold(uint8_t B);
+	static void en_pwm_mode(uint8_t B);
+	static void pwm_autoscale(uint8_t B);
+	static void microsteps(uint16_t ms);
+	static void toff(uint8_t B);
+	static void irun(uint8_t B);
+	static void ihold(uint8_t B);
+	static void iholddelay(uint8_t B);
+	static void GLOBAL_SCALER(uint8_t input);
+	static void RAMPMODE(uint8_t input);
+	static void VSTART(uint32_t input);
+	static void a1(uint16_t input);
+	static void v1(uint32_t input);
+	static void AMAX(uint16_t input) ;
+	static void VMAX(uint32_t input);
+	static void DMAX(uint16_t input);
+	static void d1(uint16_t input) ;
+	static void VSTOP(uint32_t input) ;
+	static void shaft(uint8_t B);
+	static void XACTUAL(int32_t input);
+	
 }
