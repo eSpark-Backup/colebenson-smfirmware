@@ -6,6 +6,9 @@
 SPIClass *mySPI;
 uint32_t spi_speed;
 VMAX_t vmax_register;
+DRVCONF_t DRVCONF_register;
+IHOLD_IRUN_t IHOLD_IRUN_register;
+SPISettings *settings;
 
 extern "C"
 {
@@ -21,6 +24,7 @@ extern "C"
 		if(mode == SPI_MODE)
 		{
 			beginSPI();
+			rms_current(600);
 		}
 		
 		else if(mode == UART_MODE)
@@ -73,19 +77,6 @@ extern "C"
 		return FAILED;
 	}
 	
-	/***********************************************************************************
-	 *	@purpose: set TMC registers
-	 *	
-	 *	@address: register address
-	 *  @value: value to store in register address
-	 *	@return: status, SUCCESS or FAILED
-	 *********************************************************************************/
-
-	static uint8_t setReg(uint8_t address, uint8_t value)
-	{
-		return FAILED;
-	}
-	
     /***********************************************************************************
 	 *	@purpose: Begin SPI
 	 *	
@@ -101,10 +92,10 @@ extern "C"
 		
 		mySPI =  new SPIClass(MOSI_PIN, MISO_PIN, SCK_PIN, CS_PIN);
 		spi_speed = 16000000/8;
-		//SPISettings(spi_speed, MSBFIRST, SPI_mode3);
-		//SPI.begin();
+		settings = new SPISettings(spi_speed, MSBFIRST, SPI_MODE3);
+		mySPI->begin();
 		
-		return FAILED;
+		return SUCCESS;
 	}
 	
 	/***********************************************************************************
@@ -116,6 +107,93 @@ extern "C"
 	static uint8_t beginUART()
 	{
 		return FAILED;
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: set RMS current
+	 *	
+	 *  @mA: current in mA
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static uint8_t rms_current(uint16_t mA) {
+	  uint8_t CS = 32.0*1.41421*mA/1000.0*(R_SENSE+0.02)/0.325 - 1;
+	  float holdMultiplier = 0.5;
+	  // If Current Scale is too low, turn on high sensitivity R_SENSE and calculate again
+	  if (CS < 16) {
+		vsense(TRUE);
+		CS = 32.0*1.41421*mA/1000.0*(R_SENSE+0.02)/0.180 - 1;
+	  } else { // If CS >= 16, turn off high_sense_r
+		vsense(FALSE);
+	  }
+
+	  if (CS > 31)
+		CS = 31;
+
+	  irun(CS);
+	  ihold(CS*holdMultiplier);
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: set value of register address
+	 *	
+	 *  @address_byte: byte address of register
+	 *	@config: config value
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static uint8_t write(uint8_t address_byte, uint32_t config)
+	{
+	    uint32_t data = (uint32_t)address_byte<<17 | config;
+		mySPI->beginTransaction(*settings);
+		digitalWrite(CS_PIN, LOW);
+		mySPI->transfer((data >> 16) & 0xFF);
+		mySPI->transfer((data >>  8) & 0xFF);
+		mySPI->transfer(data & 0xFF);
+		mySPI->endTransaction();
+		digitalWrite(CS_PIN, HIGH);
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: vsense settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static void vsense(uint8_t B)
+	{
+		DRVCONF_register.vsense = B;
+		write(DRVCONF_register.address, DRVCONF_register.sr);
+		
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: irun settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+    static void irun(uint8_t B)
+	{
+		IHOLD_IRUN_register.irun = B;
+		write(IHOLD_IRUN_register.address, IHOLD_IRUN_register.sr);
+		
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: ihold settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static void ihold(uint8_t B)
+	{
+		IHOLD_IRUN_register.ihold = B;
+		write(IHOLD_IRUN_register.address, IHOLD_IRUN_register.sr);
+		
 	}
 
 }

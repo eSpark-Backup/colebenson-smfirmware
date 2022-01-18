@@ -7,6 +7,8 @@
 // Constant macros
 #define FAILED 0
 #define SUCCESS 1
+#define TRUE 1
+#define FALSE 0
 #define EN_PIN           PC11
 #define CS_PIN           PA4
 #define MOSI_PIN         PA7
@@ -33,6 +35,8 @@ extern "C"
 	extern SPIClass *mySPI;
 	extern uint32_t spi_speed;
 	extern VMAX_t vmax_register;
+	extern SPISettings *settings;
+	extern DRVCONF_t DRVCONF_register;
 
 
 	// Public functions
@@ -42,7 +46,11 @@ extern "C"
 	uint8_t moveMotor(int32_t steps);
 	
 	// Private functions
-	static uint8_t setReg(uint8_t address, uint8_t value);
 	static uint8_t beginSPI();
 	static uint8_t beginUART();
+	static uint8_t rms_current(uint16_t mA);
+	static uint8_t write(uint8_t addressByte, uint32_t config);
+	static void vsense(uint8_t B);
+	static void irun(uint8_t B);
+	static void ihold(uint8_t B);
 }
