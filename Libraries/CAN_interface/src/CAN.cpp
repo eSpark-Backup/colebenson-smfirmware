@@ -23,13 +23,22 @@ extern "C"
 	 *	
 	 *  @byte: byte to be transmitted
 	 *  @msg_id: mesage id
-	 *	@ch: channel id
+	 *	@ch: channel id 1 or 2
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
 	uint8_t transmitByte(uint8_t byte, uint32_t msg_id, uint8_t ch)
 	{
-		return FAILED;
+		CAN_msg_t CAN_TX_msg;
+		
+		CAN_TX_msg.data[0] = byte;
+		CAN_TX_msg.len = 1;
+		CAN_TX_msg.type = DATA_FRAME;
+		CAN_TX_msg.format = STANDARD_FORMAT;
+		CAN_TX_msg.id = msg_id;
+		
+		CANSend(ch, &CAN_TX_msg);
+		return SUCCESS;
 	}
 	
 	/*********************************************************************************
@@ -37,13 +46,23 @@ extern "C"
 	 *	
 	 *  @word: word to be transmitted
 	 *  @msg_id: mesage id
-	 *	@ch: channel id
+	 *	@ch: channel id 1 or 2
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
 	uint8_t transmitWord(uint16_t word, uint32_t msg_id, uint8_t ch)
 	{
-		return FAILED;
+		CAN_msg_t CAN_TX_msg;
+		
+		CAN_TX_msg.data[0] = word & 0xFF;
+		CAN_TX_msg.data[1] = (word >> 8) & 0xFF;
+		CAN_TX_msg.len = 2;
+		CAN_TX_msg.type = DATA_FRAME;
+		CAN_TX_msg.format = STANDARD_FORMAT;
+		CAN_TX_msg.id = msg_id;
+		
+		CANSend(ch, &CAN_TX_msg);
+		return SUCCESS;
 	}
 	
 	/*********************************************************************************
@@ -51,13 +70,25 @@ extern "C"
 	 *	
 	 *  @dword: double word to be transmitted
 	 *  @msg_id: mesage id
-	 *	@ch: channel id
+	 *	@ch: channel id 1 or 2
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
 	uint8_t transmitDWord(uint32_t dword, uint32_t msg_id, uint8_t ch)
 	{
-		return FAILED;
+		CAN_msg_t CAN_TX_msg;
+		
+		CAN_TX_msg.data[0] = dword & 0xFF;
+		CAN_TX_msg.data[1] = (dword >> 8) & 0xFF;
+		CAN_TX_msg.data[2] = (dword >> 16) & 0xFF;
+		CAN_TX_msg.data[3] = (dword >> 24) & 0xFF;
+		CAN_TX_msg.len = 4;
+		CAN_TX_msg.type = DATA_FRAME;
+		CAN_TX_msg.format = STANDARD_FORMAT;
+		CAN_TX_msg.id = msg_id;
+		
+		CANSend(ch, &CAN_TX_msg);
+		return SUCCESS;
 	}
 	
 	/*********************************************************************************
@@ -67,9 +98,12 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
-	uint8_t transmitDS(CAN_msg_t DS)
+	uint8_t transmitDS(CAN_msg_t* DS)
 	{
-		return FAILED;
+		uint8_t ch = DS->ch;
+		
+		CANSend(ch, DS);
+		return SUCCESS;
 	}
 	
 	/*********************************************************************************
@@ -82,6 +116,17 @@ extern "C"
 	
 	uint8_t receiveByte(uint8_t* byte, uint8_t ch)
 	{
+		CAN_msg_t CAN_RX_msg;
+		if(CANMsgAvail(ch))
+		{
+			CANReceive(ch, &CAN_RX_msg);
+			*byte = CAN_RX_msg.data[0];
+			
+			return SUCCESS;
+		}else{
+			return FAILED;
+		}
+		
 		return FAILED;
 	}
 	
@@ -95,6 +140,17 @@ extern "C"
 	
 	uint8_t receiveWord(uint16_t* word, uint8_t ch)
 	{
+		CAN_msg_t CAN_RX_msg;
+		if(CANMsgAvail(ch))
+		{
+			CANReceive(ch, &CAN_RX_msg);
+			*word = (CAN_RX_msg.data[1] << 8) | CAN_RX_msg.data[0];
+			
+			return SUCCESS;
+		}else{
+			return FAILED;
+		}
+		
 		return FAILED;
 	}
 	
@@ -106,20 +162,42 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
-	uint8_t receiveDWORD(uint32_t* dword, uint8_t ch)
+	uint8_t receiveDword(uint32_t* dword, uint8_t ch)
 	{
+		CAN_msg_t CAN_RX_msg;
+		if(CANMsgAvail(ch))
+		{
+			CANReceive(ch, &CAN_RX_msg);
+			*dword = (CAN_RX_msg.data[3] << 24) | (CAN_RX_msg.data[2] << 16) | (CAN_RX_msg.data[1] << 8) | CAN_RX_msg.data[0];
+			
+			return SUCCESS;
+		}else{
+			return FAILED;
+		}
+		
 		return FAILED;
 	}
 	
 	/*********************************************************************************
 	 *	@purpose: receive CAN_msg_t struct
 	 *	
-	 *  @DS: reference of CAN_msg_t struct to store at
+	 *  @DS: reference of CAN_msg_t struct to store at; makesure channel id is entered into ch member of struct
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
 	uint8_t receiveDS(CAN_msg_t* DS)
 	{
+		uint8_t ch = DS->ch;
+		
+		if(CANMsgAvail(ch))
+		{
+			CANReceive(ch, DS);
+			
+			return SUCCESS;
+		}else{
+			return FAILED;
+		}
+		
 		return FAILED;
 	}
 	
@@ -385,4 +463,180 @@ extern "C"
 	  CAN1->FA1R |= (0x1UL << index);              // Activate filter
 
 	}
+	
+	/*********************************************************************************
+	 * @purpose:  Encodes CAN messages using the CAN message struct and populates the
+	 *  data registers with the sent.
+	 *
+	 *  @CAN_tx_msg: - CAN message structure for transmission
+	 *********************************************************************************/
+	static void CANSend(uint8_t ch, CAN_msg_t* CAN_tx_msg)
+	{
+	  volatile int count = 0;
+
+	  uint32_t out = 0;
+	  if (CAN_tx_msg->format == EXTENDED_FORMAT) { // Extended frame format
+		out = ((CAN_tx_msg->id & CAN_EXT_ID_MASK) << 3U) | STM32_CAN_TIR_IDE;
+	  }
+	  else {                                       // Standard frame format
+		out = ((CAN_tx_msg->id & CAN_STD_ID_MASK) << 21U);
+	  }
+
+	  // Remote frame
+	  if (CAN_tx_msg->type == REMOTE_FRAME) {
+		out |= STM32_CAN_TIR_RTR;
+	  }
+
+	  if (ch == 1) {
+		CAN1->sTxMailBox[0].TDTR &= ~(0xF);
+		CAN1->sTxMailBox[0].TDTR |= CAN_tx_msg->len & 0xFUL;
+
+		CAN1->sTxMailBox[0].TDLR  = (((uint32_t) CAN_tx_msg->data[3] << 24) |
+									 ((uint32_t) CAN_tx_msg->data[2] << 16) |
+									 ((uint32_t) CAN_tx_msg->data[1] <<  8) |
+									 ((uint32_t) CAN_tx_msg->data[0]      ));
+		CAN1->sTxMailBox[0].TDHR  = (((uint32_t) CAN_tx_msg->data[7] << 24) |
+									 ((uint32_t) CAN_tx_msg->data[6] << 16) |
+									 ((uint32_t) CAN_tx_msg->data[5] <<  8) |
+									 ((uint32_t) CAN_tx_msg->data[4]      ));
+
+		// Send Go
+		CAN1->sTxMailBox[0].TIR = out | STM32_CAN_TIR_TXRQ;
+
+		// Wait until the mailbox is empty
+		while (CAN1->sTxMailBox[0].TIR & 0x1UL && count++ < 1000000);
+
+		// The mailbox don't becomes empty while loop
+		if (CAN1->sTxMailBox[0].TIR & 0x1UL) {
+		  Serial.println("Send Fail");
+		  Serial.println(CAN1->ESR);
+		  Serial.println(CAN1->MSR);
+		  Serial.println(CAN1->TSR);
+		}
+	  } // end CAN1
+
+	  if (ch == 2) {
+		CAN2->sTxMailBox[0].TDTR &= ~(0xF);
+		CAN2->sTxMailBox[0].TDTR |= CAN_tx_msg->len & 0xFUL;
+
+		CAN2->sTxMailBox[0].TDLR  = (((uint32_t) CAN_tx_msg->data[3] << 24) |
+									 ((uint32_t) CAN_tx_msg->data[2] << 16) |
+									 ((uint32_t) CAN_tx_msg->data[1] <<  8) |
+									 ((uint32_t) CAN_tx_msg->data[0]      ));
+		CAN2->sTxMailBox[0].TDHR  = (((uint32_t) CAN_tx_msg->data[7] << 24) |
+									 ((uint32_t) CAN_tx_msg->data[6] << 16) |
+									 ((uint32_t) CAN_tx_msg->data[5] <<  8) |
+									 ((uint32_t) CAN_tx_msg->data[4]      ));
+
+		// Send Go
+		CAN2->sTxMailBox[0].TIR = out | STM32_CAN_TIR_TXRQ;
+
+		// Wait until the mailbox is empty
+		while (CAN2->sTxMailBox[0].TIR & 0x1UL && count++ < 1000000);
+
+		// The mailbox don't becomes empty while loop
+		if (CAN2->sTxMailBox[0].TIR & 0x1UL) {
+		  Serial.println("Send Fail");
+		  Serial.println(CAN1->ESR);
+		  Serial.println(CAN1->MSR);
+		  Serial.println(CAN1->TSR);
+		}
+	  } // end CAN2
+
+	}
+	
+	/*********************************************************************************
+	 * @purpose: Returns whether there are CAN messages available.
+	 * @returns If pending CAN messages are in the CAN controller
+	 *********************************************************************************/
+	static uint8_t CANMsgAvail(uint8_t ch)
+	{
+	  if (ch == 1) {
+		// Check for pending FIFO 0 messages
+		return CAN1->RF0R & 0x3UL;
+	  } // end CAN1
+
+	  if (ch == 2) {
+		// Check for pending FIFO 0 messages
+		return CAN2->RF0R & 0x3UL;
+	  } // end CAN2
+	}
+	  
+	/*********************************************************************************
+	 * @purpose: Decodes CAN messages from the data registers and populates a
+	 *  		 CAN message struct with the data fields.
+	 *  @preconditions      A valid CAN message is received
+	 *  @CAN_rx_msg: CAN message structure for reception
+	 *********************************************************************************/
+	void CANReceive(uint8_t ch, CAN_msg_t* CAN_rx_msg)
+	{
+	  if (ch == 1) {
+		uint32_t id = CAN1->sFIFOMailBox[0].RIR;
+		if ((id & STM32_CAN_RIR_IDE) == 0) { // Standard frame format
+		  CAN_rx_msg->format = STANDARD_FORMAT;;
+		  CAN_rx_msg->id = (CAN_STD_ID_MASK & (id >> 21U));
+		}
+		else {                               // Extended frame format
+		  CAN_rx_msg->format = EXTENDED_FORMAT;;
+		  CAN_rx_msg->id = (CAN_EXT_ID_MASK & (id >> 3U));
+		}
+
+		if ((id & STM32_CAN_RIR_RTR) == 0) {  // Data frame
+		  CAN_rx_msg->type = DATA_FRAME;
+		}
+		else {                                // Remote frame
+		  CAN_rx_msg->type = REMOTE_FRAME;
+		}
+
+
+		CAN_rx_msg->len = (CAN1->sFIFOMailBox[0].RDTR) & 0xFUL;
+
+		CAN_rx_msg->data[0] = 0xFFUL &  CAN1->sFIFOMailBox[0].RDLR;
+		CAN_rx_msg->data[1] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDLR >> 8);
+		CAN_rx_msg->data[2] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDLR >> 16);
+		CAN_rx_msg->data[3] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDLR >> 24);
+		CAN_rx_msg->data[4] = 0xFFUL &  CAN1->sFIFOMailBox[0].RDHR;
+		CAN_rx_msg->data[5] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDHR >> 8);
+		CAN_rx_msg->data[6] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDHR >> 16);
+		CAN_rx_msg->data[7] = 0xFFUL & (CAN1->sFIFOMailBox[0].RDHR >> 24);
+
+		CAN1->RF0R |= 0x20UL;
+	  } // end CAN1
+
+	  if (ch == 2) {
+		uint32_t id = CAN2->sFIFOMailBox[0].RIR;
+		if ((id & STM32_CAN_RIR_IDE) == 0) { // Standard frame format
+		  CAN_rx_msg->format = STANDARD_FORMAT;;
+		  CAN_rx_msg->id = (CAN_STD_ID_MASK & (id >> 21U));
+		}
+		else {                               // Extended frame format
+		  CAN_rx_msg->format = EXTENDED_FORMAT;;
+		  CAN_rx_msg->id = (CAN_EXT_ID_MASK & (id >> 3U));
+		}
+
+		if ((id & STM32_CAN_RIR_RTR) == 0) {  // Data frame
+		  CAN_rx_msg->type = DATA_FRAME;
+		}
+		else {                                // Remote frame
+		  CAN_rx_msg->type = REMOTE_FRAME;
+		}
+
+
+		CAN_rx_msg->len = (CAN2->sFIFOMailBox[0].RDTR) & 0xFUL;
+
+		CAN_rx_msg->data[0] = 0xFFUL &  CAN2->sFIFOMailBox[0].RDLR;
+		CAN_rx_msg->data[1] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDLR >> 8);
+		CAN_rx_msg->data[2] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDLR >> 16);
+		CAN_rx_msg->data[3] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDLR >> 24);
+		CAN_rx_msg->data[4] = 0xFFUL &  CAN2->sFIFOMailBox[0].RDHR;
+		CAN_rx_msg->data[5] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDHR >> 8);
+		CAN_rx_msg->data[6] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDHR >> 16);
+		CAN_rx_msg->data[7] = 0xFFUL & (CAN2->sFIFOMailBox[0].RDHR >> 24);
+
+		CAN2->RF0R |= 0x20UL;
+	  } // END CAN2
+
+	}
+
+
 }
