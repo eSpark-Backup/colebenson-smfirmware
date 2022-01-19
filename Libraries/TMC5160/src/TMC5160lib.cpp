@@ -64,9 +64,9 @@ extern "C"
 			XACTUAL(0);
 		}
 		
-		else if(mode == UART_MODE)
+		else if(mode == STEP_MODE)
 		{
-			beginUART();
+			beginSTEP();
 		}
 			
 		return FAILED;

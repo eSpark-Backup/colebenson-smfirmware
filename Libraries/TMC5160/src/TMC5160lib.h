@@ -23,7 +23,7 @@ extern "C"
 	enum stepper_mode
 	{
 		SPI_MODE,
-		UART_MODE,
+		STEP_MODE,
 	};
 
 	enum stepper_dir
