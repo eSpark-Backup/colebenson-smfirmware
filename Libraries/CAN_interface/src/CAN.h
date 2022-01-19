@@ -19,6 +19,26 @@ struct CAN_msg_t
   uint8_t  type;      /* 0 - DATA FRAME, 1 - REMOTE FRAME                */
 };
 
+typedef const struct
+{
+  uint8_t TS2;
+  uint8_t TS1;
+  uint8_t BRP;
+} CAN_bit_timing_config_t;
+
+
+/* Symbolic names for bit rate of CAN message                                */
+typedef enum {CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_1000KBPS} BITRATE;
+
+/* Symbolic names for formats of CAN message                                 */
+typedef enum {STANDARD_FORMAT = 0, EXTENDED_FORMAT} CAN_FORMAT;
+
+/* Symbolic names for type of CAN message                                    */
+typedef enum {DATA_FRAME = 0, REMOTE_FRAME}         CAN_FRAME;
+
+CAN_bit_timing_config_t can_configs[6] = {{2, 12, 56}, {2, 12, 28}, {2, 13, 21}, {2, 11, 12}, {2, 11, 6}, {1, 5, 6}};
+
+
 extern "C"
 {
 	// Public functions
@@ -33,5 +53,8 @@ extern "C"
 	uint8_t receiveDS(CAN_msg_t* DS);
 	
 	// Private functions
-	
+	static uint8_t CANInit(BITRATE bitrate, int remap);
+	static void CANSetGpio(GPIO_TypeDef * addr, uint8_t index, uint8_t speed = 3);
+	static void CANSetFilter(uint8_t index, uint8_t scale, uint8_t mode, uint8_t fifo, uint32_t bank1, uint32_t bank2);
+	static void printRegister(char * buf, uint32_t reg);
 }
