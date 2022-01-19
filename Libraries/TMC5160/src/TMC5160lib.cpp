@@ -24,6 +24,8 @@ D1_t D1_register;
 VSTOP_t VSTOP_register;
 XACTUAL_t XACTUAL_register;
 XTARGET_t XTARGET_register;
+uint8_t selected_mode;
+uint32_t delay_us;
 
 extern "C"
 {
@@ -36,6 +38,10 @@ extern "C"
 	 
 	uint8_t initTMC(uint8_t mode)
 	{
+		pinMode(EN_PIN, OUTPUT);
+		digitalWrite(EN_PIN, LOW);
+		selected_mode = mode;
+		
 		if(mode == SPI_MODE)
 		{
 			beginSPI();
@@ -66,7 +72,14 @@ extern "C"
 		
 		else if(mode == STEP_MODE)
 		{
-			beginSTEP();
+			beginSPI();
+			rms_current(600);
+			en_pwm_mode(TRUE);
+			pwm_autoscale(TRUE);
+			microsteps(128);
+			toff(1);
+			
+			beginStep();
 		}
 			
 		return FAILED;
@@ -83,7 +96,13 @@ extern "C"
 
 	uint8_t setSpeed(uint32_t speed)
 	{
-		VMAX(speed);	
+		if(selected_mode == SPI_MODE)
+		{
+			VMAX(speed);
+		}else if(selected_mode == STEP_MODE)
+		{
+			delay_us = ((1 / speed) / 2) * 1000000;
+		}			
 		return FAILED;
 	}
 	
@@ -92,12 +111,19 @@ extern "C"
 	 *	@purpose: invert stepper motor direction
 	 *	
 	 *	@dir: INVERT or NOT_INVERT
+	 *  @dir: in case of STEP_MODE use FORWARD or BACKWARD
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 
 	uint8_t setDir(uint8_t dir)
 	{
-		shaft(dir);	
+		if(selected_mode == SPI_MODE)
+		{
+			shaft(dir);
+		}else if(selected_mode == STEP_MODE)
+		{
+			digitalWrite(DIR_PIN, dir);
+		}			
 		return FAILED;
 	}
 	
@@ -105,12 +131,27 @@ extern "C"
 	 *	@purpose: move motor specified usteps 
 	 *	
 	 *	@steps: usteps to move; range = -2^31...(2^31)-1
+	 *  @steps: in case of STEP mode; range = 0...2^32 - 1
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 
 	uint8_t moveMotor(int32_t steps)
 	{
-		XTARGET(steps);
+		if(selected_mode == SPI_MODE)
+		{
+			XTARGET(steps);
+		}else if(selected_mode == STEP_MODE)
+		{
+			uint32_t steps_ul = (uint32_t) steps;
+			for(uint32_t i = 0; i < steps_ul; i++)
+			{
+				digitalWrite(STEP_PIN, HIGH);
+				delayMicroseconds(delay_us);
+				
+				digitalWrite(STEP_PIN, LOW);
+				delayMicroseconds(delay_us);
+			}
+		}
 		return FAILED;
 	}
 	
@@ -124,8 +165,6 @@ extern "C"
 	{
 		pinMode(CS_PIN, OUTPUT);
 		digitalWrite(CS_PIN, HIGH);
-		pinMode(EN_PIN, OUTPUT);
-		digitalWrite(EN_PIN, LOW);
 		
 		mySPI =  new SPIClass(MOSI_PIN, MISO_PIN, SCK_PIN, CS_PIN);
 		spi_speed = 16000000/8;
@@ -475,6 +514,17 @@ extern "C"
 		case   0: mres(8); break;
 		default: break;
 	  }
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: begin step/dir mode
+	 *	
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static uint8_t beginStep() {
+		pinMode(STEP_PIN, OUTPUT);
+		pinMode(DIR_PIN, OUTPUT);
 	}
 }
 

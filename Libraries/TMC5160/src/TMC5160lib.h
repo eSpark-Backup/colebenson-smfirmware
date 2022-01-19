@@ -9,12 +9,16 @@
 #define SUCCESS 1
 #define TRUE 1
 #define FALSE 0
+#define R_SENSE          0.0165f
+
+//Pin numbers defined
 #define EN_PIN           PC11
 #define CS_PIN           PA4
 #define MOSI_PIN         PA7
 #define MISO_PIN         PA6
 #define SCK_PIN          PA5
-#define R_SENSE          0.0165f
+#define STEP_PIN 		 PC7
+#define DIR_PIN			 PC8
 
 
 extern "C"
@@ -26,10 +30,16 @@ extern "C"
 		STEP_MODE,
 	};
 
-	enum stepper_dir
+	enum stepper_dir_spi
 	{
 		NOT_INVERT,
 		INVERT,
+	};
+	
+	enum stepper_dir_step
+	{
+		BACKWARD,
+		FORWARD,
 	};
 	
 	extern SPIClass *mySPI;
@@ -44,7 +54,7 @@ extern "C"
 	
 	// Private functions
 	static uint8_t beginSPI();
-	static uint8_t beginUART();
+	static uint8_t beginStep();
 	static uint8_t rms_current(uint16_t mA);
 	static uint8_t write(uint8_t addressByte, uint32_t config);
 	static void vsense(uint8_t B);
