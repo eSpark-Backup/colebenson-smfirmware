@@ -23,6 +23,7 @@ DMAX_t DMAX_register;
 D1_t D1_register;
 VSTOP_t VSTOP_register;
 XACTUAL_t XACTUAL_register;
+XTARGET_t XTARGET_register;
 
 extern "C"
 {
@@ -82,7 +83,7 @@ extern "C"
 
 	uint8_t setSpeed(uint32_t speed)
 	{
-			
+		VMAX(speed);	
 		return FAILED;
 	}
 	
@@ -96,7 +97,7 @@ extern "C"
 
 	uint8_t setDir(uint8_t dir)
 	{
-			
+		shaft(dir);	
 		return FAILED;
 	}
 	
@@ -109,7 +110,7 @@ extern "C"
 
 	uint8_t moveMotor(int32_t steps)
 	{
-			
+		XTARGET(steps);
 		return FAILED;
 	}
 	
@@ -259,17 +260,38 @@ extern "C"
 		write(PWMCONF_register.address, PWMCONF_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: mres settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void mres(uint8_t B)
 	{
 		CHOPCONF_register.mres = B;
 		write(CHOPCONF_register.address, CHOPCONF_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: toff settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void toff(uint8_t B)
 	{
 		CHOPCONF_register.toff = B;
 		write(CHOPCONF_register.address, CHOPCONF_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: iholddelay settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void iholddelay(uint8_t B)
 	{
@@ -278,50 +300,120 @@ extern "C"
 		
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: GLOBAL_SCALER settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void GLOBAL_SCALER(uint8_t input) {
 	  GLOBAL_SCALER_register.sr = input;
 	  write(GLOBAL_SCALER_register.address, GLOBAL_SCALER_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: RAMPMODE settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void RAMPMODE(uint8_t input) {
 	  RAMPMODE_register.sr = input;
 	  write(RAMPMODE_register.address, RAMPMODE_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: VSTART settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void VSTART(uint32_t input) {
 	  VSTART_register.sr = input;
 	  write(VSTART_register.address, VSTART_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: a1 settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void a1(uint16_t input) {
 	  A1_register.sr = input;
 	  write(A1_register.address, A1_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: v1 settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void v1(uint32_t input) {
 	  V1_register.sr = input;
 	  write(V1_register.address, V1_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: AMAX settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void AMAX(uint16_t input) {
 	  AMAX_register.sr = input;
 	  write(AMAX_register.address, AMAX_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: VMAX settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void VMAX(uint32_t input) {
 	  VMAX_register.sr = input;
 	  write(VMAX_register.address, VMAX_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: DMAX settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void DMAX(uint16_t input) {
 	  DMAX_register.sr = input;
 	  write(DMAX_register.address, DMAX_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: d1 settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void d1(uint16_t input) {
 	  D1_register.sr = input;
 	  write(D1_register.address, D1_register.sr);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: VSTOP settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void VSTOP(uint32_t input) {
 	  //if (input == 0 && RAMPMODE() == 0) return;
@@ -329,14 +421,46 @@ extern "C"
 	  write(VSTOP_register.address, VSTOP_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: shaft settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void shaft(uint8_t B) {
 	  GCONF_register.shaft = B;
 	  write(GCONF_register.address, GCONF_register.sr);
 	}
 	
+	/***********************************************************************************
+	 *	@purpose: XACTUAL settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
 	static void XACTUAL(int32_t input) {
 	  write(XACTUAL_register.address, input);
 	}
+	
+	/***********************************************************************************
+	 *	@purpose: XTARGET settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	static void XTARGET(int32_t input) {
+	  write(XTARGET_register.address, input);
+	}
+	
+	/***********************************************************************************
+	 *	@purpose: microsteps settings
+	 *	
+	 *	@B: boolean
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
 	
 	static void microsteps(uint16_t ms) {
 	  switch(ms) {
