@@ -1,6 +1,27 @@
 #include <ICM.h>
 
+uint8_t initGyro()
+{
+	
+}
 
+uint8_t getGyro()
+{
+	
+}
+
+uint8_t getAccel()
+{
+	
+}
+
+
+
+
+
+
+
+/*
 #define ICM20649_I2CADDR_DEFAULT 0x68
 
 bool begin_I2C(uint8_t i2c_address, TwoWire *wire, int32_t sensor_id) {
@@ -36,3 +57,4 @@ getGyroRange(void) {
   return (icm20649_gyro_range_t)readGyroRange();
 }
 
+*/
