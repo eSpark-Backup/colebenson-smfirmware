@@ -22,4 +22,6 @@ void loop() {
   Serial.println("Temperature in F");
   Serial.println(tempF);
 
+  delay(1000);
+
 }

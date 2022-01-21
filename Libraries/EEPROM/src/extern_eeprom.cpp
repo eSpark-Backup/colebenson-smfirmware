@@ -12,9 +12,9 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
-	uint8_t initEEPROM()
+	uint8_t initEEPROM(int SDA, int SCL)
 	{
-		tw = new TwoWire(SDA_EEPROM, SCK_EEPROM);
+		tw = new TwoWire(SDA, SCL);
 		
 		tw->begin();
 		pinMode(WP, OUTPUT);
@@ -38,9 +38,11 @@ extern "C"
 		tw->write(address >> 8);
 		tw->write(address & 0xFF);
 		
-		tw->endTransmission(false);
+		tw->write(value);
 		
-		return SUCCESS;
+		uint8_t status = tw->endTransmission(false);
+		
+		return (status ? FAILED : SUCCESS);
 	}
 	
 	/*********************************************************************************
@@ -53,10 +55,17 @@ extern "C"
 	
 	uint8_t retrieveByte(uint16_t address, uint8_t* value)
 	{
-		tw->requestFrom(ADDRESS_EEPROPM, 1);
+		tw->beginTransmission(ADDRESS_EEPROPM);
+		
+		tw->write(address >> 8);
+		tw->write(address & 0xFF);
+		
+		tw->endTransmission(false);
+		
+		uint8_t status = tw->requestFrom(ADDRESS_EEPROPM, 1);
 		
 		*value = tw->read();
 		
-		return SUCCESS;
+		return status ? SUCCESS : FAILED;
 	}
 }
