@@ -1,4 +1,6 @@
-bool begin_I2C(uint8_t i2c_addr = ICM20649_I2CADDR_DEFAULT, TwoWire *wire = &Wire, int32_t sensor_id = 0);
+
+
+bool begin_I2C(uint8_t i2c_addr = ICM20649_I2CADDR_DEFAULT, TwoWire *wire = &Wire, int32_t sensor_id = 0); 
 
 bool getAccelRange(void);
 

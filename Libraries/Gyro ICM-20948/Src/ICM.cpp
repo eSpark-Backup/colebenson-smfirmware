@@ -1,4 +1,7 @@
+#include <ICM.h>
 
+
+#define ICM20649_I2CADDR_DEFAULT 0x68
 
 bool begin_I2C(uint8_t i2c_address, TwoWire *wire, int32_t sensor_id) {
 
@@ -6,7 +9,7 @@ bool begin_I2C(uint8_t i2c_address, TwoWire *wire, int32_t sensor_id) {
     delete i2c_dev; // remove old interface
   }
 
-  i2c_dev = new Adafruit_I2CDevice(i2c_address, wire);
+  i2c_dev = new Adafruit_I2CDevice(ICM20649_I2CADDR_DEFAULT 0x68, wire);
 
   if (!i2c_dev->begin()) {
     Serial.println("I2C begin Failed");
