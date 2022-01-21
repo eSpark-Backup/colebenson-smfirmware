@@ -1,6 +1,6 @@
 #include "MCP9805.h"
 
-TwoWire* tw;
+TwoWire tw;
 
 extern "C"
 {
@@ -12,9 +12,12 @@ extern "C"
 	 
 	 uint8_t initMCP()
 	 {
-		tw = new TwoWire(SDA_MCP, SCK_MCP);
+		//tw = TwoWire(SDA_MCP, SCK_MCP);
+		tw.setSDA(SDA_MCP);
+		tw.setSCL(SCK_MCP);
 		
-		tw->begin();
+		tw.setClock(10000);
+		tw.begin();
 		
 		
 		
@@ -67,24 +70,24 @@ extern "C"
 	 
 	 static void configure()
 	 {
-		 tw->beginTransmission(ADDRESS_MCP);
+		 tw.beginTransmission(ADDRESS_MCP);
 		 
 		 //Select configuration register
-		 tw->write(CONFIG);
+		 tw.write(CONFIG);
 		 //Continuous conversion mode, Power-up result
-		 tw->write(0x00);
-		 tw->write(0x00);
+		 tw.write(0x00);
+		 tw.write(0x00);
 		 
-		 tw->endTransmission();
+		 tw.endTransmission();
 		 
-		 tw->beginTransmission(ADDRESS_MCP);
+		 tw.beginTransmission(ADDRESS_MCP);
 		 
 		 //Select resolution register
-		 tw->write(0x08);
+		 tw.write(0x08);
 		 //Resolution = 0.0625 / C
-		 tw->write(0x03);
+		 tw.write(0x03);
 		 
-		 tw->endTransmission();
+		 tw.endTransmission();
 		 
 		 
 	 }
@@ -99,19 +102,19 @@ extern "C"
 	 {
 		unsigned int data[2];
 		 
-		tw->beginTransmission(ADDRESS_MCP);
+		tw.beginTransmission(ADDRESS_MCP);
 		 
 		//Select data register
-		tw->write(DATA);
+		tw.write(DATA);
 		
-		tw->endTransmission();
+		tw.endTransmission();
 		
-		tw->requestFrom(ADDRESS_MCP, 2);
+		tw.requestFrom(ADDRESS_MCP, 2);
 		
-		if(tw->available() == 2)
+		if(tw.available() == 2)
 		{
-			data[0] = tw->read();
-			data[1] = tw->read();
+			data[0] = tw.read();
+			data[1] = tw.read();
 		}
 		
 		// Convert the data to 13-bits

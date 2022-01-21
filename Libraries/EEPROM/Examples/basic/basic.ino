@@ -1,13 +1,14 @@
 #include "extern_eeprom.h"
 
-uint8_t value_store = 36;
-uint8_t value_retrieve;
+uint8_t value_store = 29;
+uint8_t value_retrieve = 0;
 uint16_t address = 0;
 
 void setup() {
   // put your setup code here, to run once:
 
   initEEPROM();
+  
 
 }
 
