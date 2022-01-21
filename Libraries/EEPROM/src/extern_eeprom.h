@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Arduino.h"
 #include "Wire.h"
 
@@ -15,7 +17,7 @@
 extern "C"
 {
 	//Public functions
-	uint8_t initEEPROM();
+	uint8_t initEEPROM(int SDA = SDA_EEPROM, int SCL = SCK_EEPROM);
 	uint8_t storeByte(uint16_t address, uint8_t value);
 	uint8_t retrieveByte(uint16_t address, uint8_t* value);
 	
