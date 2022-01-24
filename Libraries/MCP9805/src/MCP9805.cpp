@@ -10,11 +10,10 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	 
-	 uint8_t initMCP()
+	 uint8_t initMCP(uint32_t SDA, uint32_t SCL)
 	 {
-		//tw = TwoWire(SDA_MCP, SCK_MCP);
-		tw.setSDA(SDA_MCP);
-		tw.setSCL(SCK_MCP);
+		tw.setSDA(SDA);
+		tw.setSCL(SCL);
 		
 		tw.setClock(10000);
 		tw.begin();

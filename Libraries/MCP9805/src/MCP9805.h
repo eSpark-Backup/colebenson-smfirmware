@@ -21,7 +21,7 @@
 extern "C"
 {
 	//Public functions
-	uint8_t initMCP();
+	uint8_t initMCP(uint32_t SDA = SDA_MCP, uint32_t SCL = SCK_MCP);
 	uint8_t getTempC(float *tempC);
 	uint8_t getTempF(float *tempF);
 	
