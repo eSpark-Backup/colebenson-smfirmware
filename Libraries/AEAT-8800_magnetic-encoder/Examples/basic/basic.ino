@@ -15,6 +15,9 @@ void loop() {
   Serial.println("Get Angle");
   Serial.println(angle);
 
+  Serial.println("Get Status");
+  Serial.println(status);
+
   delay(1000);
 
 }

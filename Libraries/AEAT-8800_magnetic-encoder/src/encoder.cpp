@@ -97,10 +97,10 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	
-	uint8_t initEncoder()
+	uint8_t initEncoder(uint32_t MOSI, uint32_t MISO, uint32_t SCK, uint32_t CS)
 	{
-		pinMode(EN_CS, OUTPUT);
-		mySPI = new SPIClass(EN_MOSI, EN_MISO, EN_SCK);
+		pinMode(CS, OUTPUT);
+		mySPI = new SPIClass(MOSI, MISO, SCK);
 		mySPI->beginTransaction(SPISettings(SPI_CLOCK_DIV2, MSBFIRST, SPI_MODE3));
 		
 		applicationInit();
@@ -204,6 +204,15 @@ extern "C"
 	  }
 
 	  *dataOut = newAngle;
+	  
+	  if(status < 8)
+	  {
+		  status = FAILED;
+	  }else if(status >= 8)
+	  {
+		  status = SUCCESS;
+	  }
+	  
 	  return status;
 	}
 }

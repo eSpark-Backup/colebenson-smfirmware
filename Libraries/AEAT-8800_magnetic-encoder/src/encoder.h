@@ -18,7 +18,7 @@ extern "C"
 {
 	
 	// Public functions
-	uint8_t initEncoder();
+	uint8_t initEncoder(uint32_t MOSI = EN_MOSI, uint32_t MISO = EN_MISO, uint32_t SCK = EN_SCK, uint32_t CS = EN_CS);
 	uint8_t getAngle(uint16_t *dataOut);
 	
 	//Private functions
