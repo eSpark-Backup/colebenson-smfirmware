@@ -12,10 +12,29 @@ extern "C"
 	 *	@return: status, SUCCESS or FAILED
 	 *********************************************************************************/
 	 
-	uint8_t initCAN()
+	uint8_t initCAN(BITRATE BR, uint8_t rm)
 	{
-		uint8_t ret = CANInit(CAN_1000KBPS, 3);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
+		uint8_t ret = CANInit(BR, rm);  // CAN_RX mapped to PD0, CAN_TX mapped to PD1
 		return ret ? SUCCESS: FAILED;
+	}
+	
+	/*********************************************************************************
+	 *	@purpose: enable terminal resistors
+	 *	
+	 *	@TERM1: Pin definition of terminal 1
+	 *	@TERM2: Pin definition of terminal 2
+	 *	@return: status, SUCCESS or FAILED
+	 *********************************************************************************/
+	
+	uint8_t enableTerminal(uint32_t TERM1, uint32_t TERM2)
+	{
+		pinMode(TERM1, OUTPUT);
+		pinMode(TERM2, OUTPUT);
+		
+		digitalWrite(TERM1, HIGH);
+		digitalWrite(TERM2, HIGH);
+		
+		return SUCCESS;
 	}
 	
 	/*********************************************************************************
@@ -547,6 +566,7 @@ extern "C"
 	
 	/*********************************************************************************
 	 * @purpose: Returns whether there are CAN messages available.
+	 * 
 	 * @returns If pending CAN messages are in the CAN controller
 	 *********************************************************************************/
 	static uint8_t CANMsgAvail(uint8_t ch)

@@ -17,6 +17,9 @@
 #define CAN_EXT_ID_MASK                 0x1FFFFFFFU
 #define CAN_STD_ID_MASK                 0x000007FFU
 
+#define CAN_NL_MCU PC1
+#define CAN_NH_MCU PC2
+
 
 // variables and structs
 struct CAN_msg_t
@@ -46,13 +49,16 @@ typedef enum {STANDARD_FORMAT = 0, EXTENDED_FORMAT} CAN_FORMAT;
 /* Symbolic names for type of CAN message                                    */
 typedef enum {DATA_FRAME = 0, REMOTE_FRAME}         CAN_FRAME;
 
+/* Symbolic names for type of remapping pins                                   */
+typedef enum {CAN_REMAP1 = 0, CAN_REMAP2 = 2, CAN_REMAP3 = 3}         CAN_REMAP;
+
 CAN_bit_timing_config_t can_configs[6] = {{2, 12, 56}, {2, 12, 28}, {2, 13, 21}, {2, 11, 12}, {2, 11, 6}, {1, 5, 6}};
 
 
 extern "C"
 {
 	// Public functions
-	uint8_t initCAN();
+	uint8_t initCAN(BITRATE BR = CAN_1000KBPS, uint8_t rm = CAN_REMAP3);
 	uint8_t transmitByte(uint8_t byte, uint32_t msg_id, uint8_t ch);
 	uint8_t transmitWord(uint16_t word, uint32_t msg_id, uint8_t ch);
 	uint8_t transmitDWord(uint32_t dword, uint32_t msg_id, uint8_t ch);
@@ -61,6 +67,7 @@ extern "C"
 	uint8_t receiveWord(uint16_t* word, uint8_t ch);
 	uint8_t receiveDword(uint32_t* dword, uint8_t ch);
 	uint8_t receiveDS(CAN_msg_t* DS);
+	uint8_t enableTerminal(uint32_t TERM1 = CAN_NL_MCU, uint32_t TERM2 = CAN_NH_MCU);
 	
 	// Private functions
 	static uint8_t CANInit(BITRATE bitrate, int remap);
