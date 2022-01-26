@@ -74,13 +74,13 @@ extern "C"
 		
 		readMeasurements(ICM20X_B0_ACCEL_XOUT_H, 6, buffer);
 		
-		rawAccX = (((buffer[0] << 8) | buffer[1]);
-		rawAccY = (((buffer[2] << 8) | buffer[3]);
-		rawAccZ = (((buffer[4] << 8) | buffer[5]);
+		rawAccX = ((buffer[0] << 8) | buffer[1]);
+		rawAccY = ((buffer[2] << 8) | buffer[3]);
+		rawAccZ = ((buffer[4] << 8) | buffer[5]);
 		
-		acc->x = rawAccX * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
-		acc->y = rawAccY * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
-		acc->z = rawAccZ * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
+		acc->x = rawAccX * SENSORS_GRAVITY_EARTH / ICM20649_ACCEL_RANGE_30_G;
+		acc->y = rawAccY * SENSORS_GRAVITY_EARTH / ICM20649_ACCEL_RANGE_30_G;
+		acc->z = rawAccZ * SENSORS_GRAVITY_EARTH / ICM20649_ACCEL_RANGE_30_G;
 		
 		return SUCCESS;
 	}
