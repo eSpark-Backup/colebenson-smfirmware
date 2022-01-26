@@ -56,6 +56,21 @@
 #define ICM20948_CHIP_ID 0xEA ///< ICM20948 default device id from WHOAMI
 #define ICM20649_CHIP_ID 0xE1 ///< ICM20649 default device id from WHOAMI
 
+#define SENSORS_GRAVITY_EARTH (9.80665F) /**< Earth's gravity in m/s^2 */
+#define SENSORS_DPS_TO_RADS (0.017453293F) /**< Degrees/s to rad/s multiplier */
+
+// Gyro scale
+#define ICM20649_GYRO_RANGE_500_DPS 65.5
+#define ICM20649_GYRO_RANGE_1000_DPS 32.8
+#define ICM20649_GYRO_RANGE_2000_DPS 16.4
+#define ICM20649_GYRO_RANGE_4000_DPS 8.2
+
+// Acc scale
+#define ICM20649_ACCEL_RANGE_4_G 8192.0
+#define ICM20649_ACCEL_RANGE_8_G 4096.0
+#define ICM20649_ACCEL_RANGE_8_G 2048.0
+#define ICM20649_ACCEL_RANGE_30_G 1024.0
+
 typedef struct
 {
 	float x;
@@ -69,6 +84,7 @@ extern "C"
 	uint8_t initICM();
 	uint8_t getGyro(sensor_t* gyro);
 	uint8_t getAccel(sensor_t* acc);
+	uint8_t getTemp(float* tempC);
 	
 	// Private functions
 	static uint8_t write(uint8_t reg, uint8_t byte, uint8_t stop = false);

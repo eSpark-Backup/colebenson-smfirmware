@@ -39,26 +39,48 @@ extern "C"
 
 	uint8_t getGyro(sensor_t* gyro)
 	{
-		uint8_t buffer[3];
+		uint8_t buffer[14];
+		int16_t rawGyroX, rawGyroY, rawGyroZ;
 		
-		readMeasurements(ICM20X_B0_GYRO_XOUT_H, 3, buffer);
+		readMeasurements(ICM20X_B0_GYRO_XOUT_H, 6, buffer);
 		
-		gyro->x = buffer[0];
-		gyro->y = buffer[1];
-		gyro->z = buffer[2];
+		rawGyroX = (((buffer[6] << 8) | buffer[7]));
+		rawGyroY = (((buffer[8] << 8) | buffer[9]));
+		rawGyroZ = (((buffer[10] << 8) | buffer[11]));
+		
+		gyro->x = rawGyroX / ICM20649_GYRO_RANGE_4000_DPS * SENSORS_DPS_TO_RADS;
+		gyro->y = rawGyroY / ICM20649_GYRO_RANGE_4000_DPS * SENSORS_DPS_TO_RADS;
+		gyro->z = rawGyroZ / ICM20649_GYRO_RANGE_4000_DPS * SENSORS_DPS_TO_RADS;
+		
+		return SUCCESS;
+	}
+	
+	uint8_t getTemp(float* tempC)
+	{
+		uint8_t buffer[14];
+		
+		readMeasurements(ICM20X_B0_GYRO_XOUT_H, 6, buffer);
+		
+		*tempC = (buffer[12] << 8) | buffer[13];
+		*tempC = *tempC / 333.87 + 21.0;
 		
 		return SUCCESS;
 	}
 
 	uint8_t getAccel(sensor_t* acc)
 	{
-		uint8_t buffer[3];
+		uint8_t buffer[14];
+		int16_t rawAccX, rawAccY, rawAccZ;
 		
-		readMeasurements(ICM20X_B0_ACCEL_XOUT_H, 3, buffer);
+		readMeasurements(ICM20X_B0_ACCEL_XOUT_H, 6, buffer);
 		
-		acc->x = buffer[0];
-		acc->y = buffer[1];
-		acc->z = buffer[2];
+		rawAccX = (((buffer[0] << 8) | buffer[1]);
+		rawAccY = (((buffer[2] << 8) | buffer[3]);
+		rawAccZ = (((buffer[4] << 8) | buffer[5]);
+		
+		acc->x = rawAccX * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
+		acc->y = rawAccY * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
+		acc->z = rawAccZ * SENSORS_GRAVITY_EARTH) / ICM20649_ACCEL_RANGE_30_G;
 		
 		return SUCCESS;
 	}
@@ -80,11 +102,11 @@ extern "C"
 		tw.beginTransmission(ADDRESS_ICM);
 		
 		tw.write(reg);
+		tw.endTransmission();
+		
 		tw.requestFrom(ADDRESS_ICM, 1);
 		
 		uint8_t res = tw.read();
-		
-		tw.endTransmission();
 		
 		return res;
 	}
@@ -103,6 +125,7 @@ extern "C"
 		
 		while(resetBit)
 		{
+			resetBit = (read(ICM20X_B0_PWR_MGMT_1) >> 7) & 0b1;
 			delay(10);
 		}
 		
@@ -119,15 +142,17 @@ extern "C"
 	
 	static void sleep(uint8_t state)
 	{
-		uint8_t byte = state << 6;
+		uint8_t byte = (state << 6) | 0x01;
 		write(ICM20X_B0_PWR_MGMT_1, byte);
 	}
 	
 	static void writeGyroRange(uint8_t new_gyro_range) {
 	  setBank(2);
 	  
-	  uint8_t byte = new_gyro_range << 1;
+	  uint8_t byte = (new_gyro_range << 1) | 0x01;
+	  
 	  write(ICM20X_B2_GYRO_CONFIG_1, byte);
+	 
 	  
 	  setBank(0);
 	}
@@ -135,7 +160,8 @@ extern "C"
 	static void writeAccelRange(uint8_t new_accel_range) {
 	  setBank(2);
 	  
-	  uint8_t byte = new_accel_range << 1;
+	  uint8_t byte = (new_accel_range << 1) | 0x01;
+	  
 	  write(ICM20X_B2_ACCEL_CONFIG_1, byte);
 	  
 	  setBank(0);
@@ -163,23 +189,26 @@ extern "C"
 	
 	static void readMeasurements(uint8_t reg, uint8_t nBytes, uint8_t* buffer)
 	{
-		uint8_t numBytes = nBytes;
+		uint8_t numBytes = 14;
 		uint8_t count = 0;
 		
 		setBank(0);
 		
 		tw.beginTransmission(ADDRESS_ICM);
 		
-		tw.write(reg);
+		tw.write(ICM20X_B0_ACCEL_XOUT_H);
+
+		tw.endTransmission(false);
 		
-		tw.endTransmission(true);
+		delay(10);
+
+		tw.requestFrom(ADDRESS_ICM, numBytes, true);
 		
-		tw.requestFrom(ADDRESS_ICM, numBytes);
-		
-		while((tw.available() > 0))
+		while(tw.available())
 		{
 			buffer[count++] = tw.read();
 		}
+
 		
 		setBank(0);
 		

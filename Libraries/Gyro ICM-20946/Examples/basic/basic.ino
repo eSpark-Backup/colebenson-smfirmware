@@ -2,6 +2,7 @@
 
 sensor_t gyro;
 sensor_t acceleration;
+float tempC;
 
 void setup() {
   // put your setup code here, to run once:
@@ -24,6 +25,11 @@ void loop() {
 
   Serial.println();
 
+  getTemp(&tempC);
+
+  Serial.println("Temperature in C");
+  Serial.println(tempC);
+
   Serial.println("Acc X");
   Serial.println(acceleration.x);
 
@@ -35,6 +41,6 @@ void loop() {
 
   Serial.println();
 
-  delay(1000);
+  delay(100);
 
 }
