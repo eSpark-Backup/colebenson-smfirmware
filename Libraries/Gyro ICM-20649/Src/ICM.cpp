@@ -5,7 +5,7 @@ TwoWire tw;
 extern "C"
 {
 
-	uint8_t initGyro()
+	uint8_t initICM()
 	{
 		tw.setSDA(SDA);
 		tw.setSCL(SCL);
@@ -39,11 +39,27 @@ extern "C"
 
 	uint8_t getGyro(sensor_t* gyro)
 	{
+		uint8_t buffer[3];
+		
+		readMeasurements(ICM20X_B0_GYRO_XOUT_H, 3, buffer);
+		
+		gyro->x = buffer[0];
+		gyro->y = buffer[1];
+		gyro->z = buffer[2];
+		
 		return SUCCESS;
 	}
 
 	uint8_t getAccel(sensor_t* acc)
 	{
+		uint8_t buffer[3];
+		
+		readMeasurements(ICM20X_B0_ACCEL_XOUT_H, 3, buffer);
+		
+		acc->x = buffer[0];
+		acc->y = buffer[1];
+		acc->z = buffer[2];
+		
 		return SUCCESS;
 	}
 	
@@ -72,6 +88,7 @@ extern "C"
 		
 		return res;
 	}
+	
 	
 	static uint8_t reset()
 	{
@@ -115,7 +132,7 @@ extern "C"
 	  setBank(0);
 	}
 	
-	static void writeAccelRange(uint8_t new_accel_ange) {
+	static void writeAccelRange(uint8_t new_accel_range) {
 	  setBank(2);
 	  
 	  uint8_t byte = new_accel_range << 1;
@@ -133,13 +150,7 @@ extern "C"
 	}
 	
 	static void setAccelRateDivisor(uint16_t new_accel_divisor) {
-	  _setBank(2);
-
-	  Adafruit_BusIO_Register accel_rate_divisor =
-		  Adafruit_BusIO_Register(i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD,
-								  ICM20X_B2_ACCEL_SMPLRT_DIV_1, 2, MSBFIRST);
-
-	  accel_rate_divisor.write(new_accel_divisor);
+	  setBank(2);
 	  
 	  uint8_t byte_H = (new_accel_divisor >> 8);
 	  uint8_t byte_L = (new_accel_divisor) & 0xFF;
@@ -147,7 +158,32 @@ extern "C"
 	  write(ICM20X_B2_ACCEL_SMPLRT_DIV_1, byte_H, true);
 	  write(ICM20X_B2_ACCEL_SMPLRT_DIV_2, byte_L);
 	  
-	  _setBank(0);
+	  setBank(0);
+	}
+	
+	static void readMeasurements(uint8_t reg, uint8_t nBytes, uint8_t* buffer)
+	{
+		uint8_t numBytes = nBytes;
+		uint8_t count = 0;
+		
+		setBank(0);
+		
+		tw.beginTransmission(ADDRESS_ICM);
+		
+		tw.write(reg);
+		
+		tw.endTransmission(true);
+		
+		tw.requestFrom(ADDRESS_ICM, numBytes);
+		
+		while((tw.available() > 0))
+		{
+			buffer[count++] = tw.read();
+		}
+		
+		setBank(0);
+		
+		
 	}
 
 }
