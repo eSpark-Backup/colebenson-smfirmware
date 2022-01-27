@@ -13,8 +13,8 @@
 #define ADDRESS_ICM 0x68 
 
 // Default I2C pins
-#define SDA PB7
-#define SCL PB6
+#define SDA_ICM PB7
+#define SCL_ICM PB6
 
 // Registers definitions
 
@@ -81,7 +81,7 @@ typedef struct
 extern "C"
 {
 	// Public functions
-	uint8_t initICM();
+	uint8_t initICM(uint32_t SDA = SDA_ICM, uint32_t SCL = SCL_ICM);
 	uint8_t getGyro(sensor_t* gyro);
 	uint8_t getAccel(sensor_t* acc);
 	uint8_t getTemp(float* tempC);
@@ -96,6 +96,6 @@ extern "C"
 	static void writeAccelRange(uint8_t new_acc_range);
 	static void setGyroRateDivisor(uint8_t new_gyro_divisor);
 	static void setAccelRateDivisor(uint16_t new_accel_divisor);
-	static void readMeasurements(uint8_t reg, uint8_t nBytes, uint8_t* buffer);
+	static void readMeasurements(uint8_t* buffer);
 }
 
