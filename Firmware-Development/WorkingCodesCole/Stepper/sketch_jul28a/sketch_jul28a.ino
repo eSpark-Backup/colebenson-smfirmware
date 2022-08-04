@@ -12,7 +12,7 @@
 //#define SERIAL_PORT Serial1 // TMC2208/TMC2224 HardwareSerial port
 #define DRIVER_ADDRESS 0b00 // TMC2209 Driver address according to MS1 and MS2
 
-#define R_SENSE 0.033f // Match to your driver
+#define R_SENSE 0.0165f // Match to your driver
                       // SilentStepStick series use 0.11
                       // UltiMachine Einsy and Archim2 boards use 0.2
                       // Panucatt BSD2660 uses 0.1
@@ -45,7 +45,7 @@ void setup() {
   driver.begin();                 //  SPI: Init CS pins and possible SW SPI pins
                                   // UART: Init SW UART (if selected) with default 115200 baudrate
   driver.toff(5);                 // Enables driver in software
-  driver.rms_current(110);        // Set motor RMS current
+  driver.rms_current(600);        // Set motor RMS current
 //  driver.irun(17);
 //  driver.ihold(10);
 //  driver.iholddelay(6);
