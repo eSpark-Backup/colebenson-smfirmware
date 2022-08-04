@@ -47,9 +47,9 @@ void setup() {
 void loop() {
   for (uint16_t i = 5000; i > 0; i--) {
     digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(160);
+    delayMicroseconds(1000);
     digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(160);
+    delayMicroseconds(1000);
   }
 }
 

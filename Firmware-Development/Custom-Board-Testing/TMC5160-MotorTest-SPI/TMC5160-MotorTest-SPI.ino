@@ -31,6 +31,10 @@ void setup() { //***************************************************************
 
   driver.begin();
 
+  // Ramp Mode ON
+  pinMode(PB4, OUTPUT);
+  digitalWrite(PB4, LOW);
+  
   //pinMode(CS_PIN, OUTPUT);
   //digitalWrite(CS_PIN, HIGH);
 
@@ -45,7 +49,7 @@ void setup() { //***************************************************************
   driver.iholddelay(6);
   driver.GLOBAL_SCALER(130);
   //ramp settings
-  driver.RAMPMODE(0);
+  driver.RAMPMODE(1);
   driver.VSTART(0);
   driver.a1(5);
   driver.v1(40);

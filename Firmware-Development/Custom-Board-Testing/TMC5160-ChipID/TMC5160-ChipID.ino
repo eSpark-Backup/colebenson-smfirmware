@@ -24,6 +24,10 @@ void setup() {
 
   pinMode(PC11, OUTPUT);
   digitalWrite(PC11, LOW);
+
+  // Ramp Mode ON
+  pinMode(PB4, OUTPUT);
+  digitalWrite(PB4, LOW);
 }
 
 void loop() {
