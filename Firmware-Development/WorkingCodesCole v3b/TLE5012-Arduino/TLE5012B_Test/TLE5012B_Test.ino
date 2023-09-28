@@ -16,15 +16,15 @@ double TLE5012GetAngle();
 #define ENC_CS    PB12
 MagneticSensorTLE5012B tle5012b(ENC_DATA, ENC_SCK, ENC_CS);
 
-#define UART_RX PC7
-#define UART_TX PC6
+// #define UART_RX PC7
+// #define UART_TX PC6
 
 void setup() 
 {
-  Serial.setRx(UART_RX);
-  Serial.setTx(UART_TX);
+  // Serial.setRx(UART_RX);
+  // Serial.setTx(UART_TX);
   Serial.begin(115200);
-  while(!Serial);
+  // while(!Serial);
   
   tle5012b.init();
 }
