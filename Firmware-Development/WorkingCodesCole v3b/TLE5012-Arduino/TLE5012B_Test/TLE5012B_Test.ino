@@ -32,6 +32,7 @@ void setup()
 void loop() 
 {
   double angle = TLE5012GetAngle();
+  delay(1000);
   Serial.println(angle);
 }
 
