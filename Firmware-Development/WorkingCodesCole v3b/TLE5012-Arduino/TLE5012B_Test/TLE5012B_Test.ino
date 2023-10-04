@@ -2,6 +2,14 @@
 #include <SimpleFOC.h>
 #include <SimpleFOCDrivers.h>
 #include "encoders/tle5012b/MagneticSensorTLE5012B.h"
+#include <Arduino.h>
+
+HardwareTimer *timer = new HardwareTimer(TIM3);
+bool ISRflag=false;
+
+void onTimer() {
+  ISRflag=true;
+}
 
 double TLE5012GetAngle();
 
@@ -25,15 +33,20 @@ void setup()
   // Serial.setTx(UART_TX);
   Serial.begin(115200);
   // while(!Serial);
-  
+  timer->setPrescaleFactor(8399); 
+  timer->setOverflow(10000);      
+  timer->attachInterrupt(onTimer);
+  timer->resume();
   tle5012b.init();
 }
 
 void loop() 
 {
-  double angle = TLE5012GetAngle();
-  delay(1000);
-  Serial.println(angle);
+  if(ISRflag){
+    double angle = TLE5012GetAngle();
+    Serial.println(angle);
+    ISRflag=false;
+  }
 }
 
 double TLE5012GetAngle()
