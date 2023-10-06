@@ -22,7 +22,7 @@ SPIClass mySPI(SW_MOSI, SW_MISO, SW_SCK);
 #define SPI mySPI
 
 // Stepper interval time
-const long interval = 160;
+const long interval = 300;
 unsigned long previousMillis = 0;
 
 #define DELETE_BIT_15               0x7FFF  
