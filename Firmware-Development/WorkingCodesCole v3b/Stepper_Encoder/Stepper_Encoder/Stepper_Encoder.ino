@@ -33,6 +33,7 @@ MagneticSensorTLE5012B tle5012b(ENC_DATA, ENC_SCK, ENC_CS);
 HardwareTimer *timer = new HardwareTimer(TIM3);
 bool ISRflag=false;
 bool shaft = false;
+double zeroRef=0; 
 
 void onTimer() {
   ISRflag=true;
@@ -51,6 +52,9 @@ void setup() {
   timer->attachInterrupt(onTimer);
   timer->resume();
   tle5012b.init();
+  zeroRef = TLE5012GetAngle();
+  Serial.print("The zero reference is: ");
+  Serial.println(zeroRef);
 
   driver.begin();                 //  SPI: Init CS pins and possible SW SPI pins
   driver.toff(5);                 // Enables driver in software
@@ -63,11 +67,20 @@ void setup() {
 }
 
 void loop() {
-    if(ISRflag){
+    if(ISRflag)
+    {
     double angle = TLE5012GetAngle();
+      if(angle<zeroRef)
+      {
+        angle=(angle-zeroRef)+360;
+      }
+      else
+      {
+      angle-=zeroRef;
+      }
     Serial.println(angle);
     ISRflag=false;
-  }
+    }
 }
 
 double TLE5012GetAngle()
